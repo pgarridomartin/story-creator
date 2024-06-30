@@ -52,4 +52,10 @@ module.exports = {
             }
         ],
     },
+    resolve: {
+        alias: {
+            '@': path.resolve(__dirname, 'src'), // Alias para el directorio src
+        },
+        extensions: ['.js', '.jsx'], // Extensiones que Webpack resolverá automáticamente
+    },
 };

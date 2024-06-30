@@ -1,5 +1,3 @@
-import React from 'react';
-
 const CharacterForm = ({ nextStep, prevStep, addCharacter }) => {
   const [character, setCharacter] = React.useState({
     name: '',

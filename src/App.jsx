@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import ReactDOM from 'react-dom';
-import { HomePage } from './pages/HomePage.js';
-import { CreateStoryPage } from './pages/CreateStoryPage.js';
+import { HomePage } from './pages/HomePage';
+import { CreateStoryPage } from './pages/CreateStoryPage';
 
 const App = () => {
   const [page, setPage] = useState('home');
@@ -12,7 +12,7 @@ const App = () => {
   };
 
   return (
-    <div>
+    <div className="container">
       {page === 'home' && <HomePage navigateTo={navigateTo} />}
       {page === 'create' && <CreateStoryPage navigateTo={navigateTo} />}
     </div>

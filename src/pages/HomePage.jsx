@@ -1,8 +1,6 @@
-import React from 'react';
-
 const HomePage = ({ navigateTo }) => {
     const handleClick = () => {
-        console.log('Botón clicado');
+        console.log('Botón clicado - handleClick');
         navigateTo('create');
     };
 

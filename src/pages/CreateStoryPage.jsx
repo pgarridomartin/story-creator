@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import { CharacterForm } from '../components/CharacterForm.js';
-import CharacterCustomization from '../components/CharacterCustomization.js';
-import { StoryForm } from '../components/StoryForm.js';
+import { useState } from 'react';
+import { CharacterForm } from '../components/CharacterForm';
+import CharacterCustomization from '../components/CharacterCustomization';
+import { StoryForm } from '../components/StoryForm';
 
 const CreateStoryPage = ({ navigateTo }) => {
   const [characters, setCharacters] = useState([]);
@@ -38,7 +38,8 @@ const CreateStoryPage = ({ navigateTo }) => {
   console.log(`Current step: ${currentStep}`);
 
   return (
-    <div>
+    <div className="container">
+      <p>hola</p>
       {currentStep === 'characterForm' && <CharacterForm nextStep={nextStep} prevStep={prevStep} addCharacter={addCharacter} />}
       {currentStep === 'characterCustomization' && <CharacterCustomization prevStep={prevStep} nextStep={nextStep} onCharacterUpdate={addCharacter} />}
       {currentStep === 'storyForm' && <StoryForm characters={characters} prevStep={prevStep} addMoreCharacters={addMoreCharacters} />}
