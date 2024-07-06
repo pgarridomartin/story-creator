@@ -1,11 +1,13 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
+import '../../public/styles.css';
 
 const CharacterCustomization = ({ onCharacterUpdate, nextStep, prevStep }) => {
     const initialCharacterState = {
         name: '',
         gender: '',
         age: '',
-        role: '',
+        relationship: '',
+        role: 'protagonist',
         skin: 'skin1',
         hair: 'hair1',
         eyes: 'eyes1'
@@ -18,7 +20,9 @@ const CharacterCustomization = ({ onCharacterUpdate, nextStep, prevStep }) => {
 
     useEffect(() => {
         localStorage.setItem('character', JSON.stringify(character));
-        onCharacterUpdate(character);
+        if (onCharacterUpdate) {
+            onCharacterUpdate(character);
+        }
     }, [character, onCharacterUpdate]);
 
     const handleInputChange = (e) => {
@@ -74,41 +78,100 @@ const CharacterCustomization = ({ onCharacterUpdate, nextStep, prevStep }) => {
                     />
                 </label>
                 <label>
+                    Parentesco:
+                    <select name="relationship" value={character.relationship} onChange={handleInputChange} required>
+                        <option value="">Selecciona</option>
+                        <option value="padre">Padre</option>
+                        <option value="madre">Madre</option>
+                        <option value="hijo">Hijo</option>
+                        <option value="hija">Hija</option>
+                    </select>
+                </label>
+                <label>
                     Rol:
                     <select name="role" value={character.role} onChange={handleInputChange} required>
                         <option value="protagonist">Protagonista</option>
                         <option value="secondary">Secundario</option>
                     </select>
                 </label>
-                <label>
-                    Tipo de Piel:
-                    <select name="skin" value={character.skin} onChange={(e) => handleImageChange('skin', e.target.value)} required>
-                        <option value="skin1">Piel 1</option>
-                        <option value="skin2">Piel 2</option>
-                        <option value="skin3">Piel 3</option>
-                    </select>
-                </label>
-                <label>
-                    Tipo de Pelo:
-                    <select name="hair" value={character.hair} onChange={(e) => handleImageChange('hair', e.target.value)} required>
-                        <option value="hair1">Pelo 1</option>
-                        <option value="hair2">Pelo 2</option>
-                        <option value="hair3">Pelo 3</option>
-                    </select>
-                </label>
-                <label>
-                    Color de Ojos:
-                    <select name="eyes" value={character.eyes} onChange={(e) => handleImageChange('eyes', e.target.value)} required>
-                        <option value="eyes1">Ojos 1</option>
-                        <option value="eyes2">Ojos 2</option>
-                        <option value="eyes3">Ojos 3</option>
-                    </select>
-                </label>
+                <div className="image-selection">
+                    <div>
+                        <p>Tipo de Piel:</p>
+                        <img
+                            src="/images/skin/skin1.png"
+                            alt="Piel 1"
+                            className={character.skin === 'skin1' ? 'selected' : ''}
+                            onClick={() => handleImageChange('skin', 'skin1')}
+                        />
+                        <img
+                            src="/images/skin/skin2.png"
+                            alt="Piel 2"
+                            className={character.skin === 'skin2' ? 'selected' : ''}
+                            onClick={() => handleImageChange('skin', 'skin2')}
+                        />
+                        <img
+                            src="/images/skin/skin3.png"
+                            alt="Piel 3"
+                            className={character.skin === 'skin3' ? 'selected' : ''}
+                            onClick={() => handleImageChange('skin', 'skin3')}
+                        />
+                    </div>
+                    <div>
+                        <p>Tipo de Pelo:</p>
+                        <img
+                            src="/images/hair/hair1.png"
+                            alt="Pelo 1"
+                            className={character.hair === 'hair1' ? 'selected' : ''}
+                            onClick={() => handleImageChange('hair', 'hair1')}
+                        />
+                        <img
+                            src="/images/hair/hair2.png"
+                            alt="Pelo 2"
+                            className={character.hair === 'hair2' ? 'selected' : ''}
+                            onClick={() => handleImageChange('hair', 'hair2')}
+                        />
+                        <img
+                            src="/images/hair/hair3.png"
+                            alt="Pelo 3"
+                            className={character.hair === 'hair3' ? 'selected' : ''}
+                            onClick={() => handleImageChange('hair', 'hair3')}
+                        />
+                    </div>
+                    <div>
+                        <p>Color de Ojos:</p>
+                        <img
+                            src="/images/eyes/eyes1.png"
+                            alt="Ojos 1"
+                            className={character.eyes === 'eyes1' ? 'selected' : ''}
+                            onClick={() => handleImageChange('eyes', 'eyes1')}
+                        />
+                        <img
+                            src="/images/eyes/eyes2.png"
+                            alt="Ojos 2"
+                            className={character.eyes === 'eyes2' ? 'selected' : ''}
+                            onClick={() => handleImageChange('eyes', 'eyes2')}
+                        />
+                        <img
+                            src="/images/eyes/eyes3.png"
+                            alt="Ojos 3"
+                            className={character.eyes === 'eyes3' ? 'selected' : ''}
+                            onClick={() => handleImageChange('eyes', 'eyes3')}
+                        />
+                    </div>
+                </div>
                 <div className="buttons">
                     <button type="button" className="button secondary" onClick={prevStep}>Atrás</button>
                     <button type="submit" className="button">Guardar y Siguiente</button>
                 </div>
             </form>
+            <div className="character-preview">
+                <h2>Vista Previa del Personaje</h2>
+                <div className="character">
+                    <img src={`/images/skin/${character.skin}.png`} alt="Piel" />
+                    <img src={`/images/hair/${character.hair}.png`} alt="Pelo" />
+                    <img src={`/images/eyes/${character.eyes}.png`} alt="Ojos" />
+                </div>
+            </div>
         </div>
     );
 };

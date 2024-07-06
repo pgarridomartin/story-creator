@@ -1,7 +1,6 @@
-import { useState } from 'react';
-import { CharacterForm } from '../components/CharacterForm';
-import CharacterCustomization from '../components/CharacterCustomization';
-import { StoryForm } from '../components/StoryForm';
+import React, { useState } from 'react';
+import CharacterCustomization from '../components/CharacterCustomization.jsx';
+import StoryForm from '../components/StoryForm.jsx';
 
 const CreateStoryPage = ({ navigateTo }) => {
   const [characters, setCharacters] = useState([]);
@@ -12,20 +11,14 @@ const CreateStoryPage = ({ navigateTo }) => {
   };
 
   const nextStep = () => {
-    console.log('Next step');
     if (currentStep === 'characterForm') {
-      setCurrentStep('characterCustomization');
-    } else if (currentStep === 'characterCustomization') {
       setCurrentStep('storyForm');
-    }
+    } 
   };
 
   const prevStep = () => {
-    console.log('Previous step');
-    if (currentStep === 'characterCustomization') {
+    if (currentStep === 'storyForm') {
       setCurrentStep('characterForm');
-    } else if (currentStep === 'storyForm') {
-      setCurrentStep('characterCustomization');
     } else if (currentStep === 'characterForm') {
       navigateTo('home');
     }
@@ -39,12 +32,10 @@ const CreateStoryPage = ({ navigateTo }) => {
 
   return (
     <div className="container">
-      <p>hola</p>
-      {currentStep === 'characterForm' && <CharacterForm nextStep={nextStep} prevStep={prevStep} addCharacter={addCharacter} />}
-      {currentStep === 'characterCustomization' && <CharacterCustomization prevStep={prevStep} nextStep={nextStep} onCharacterUpdate={addCharacter} />}
+      {currentStep === 'characterForm' && <CharacterCustomization nextStep={nextStep} prevStep={prevStep} addCharacter={addCharacter} />}
       {currentStep === 'storyForm' && <StoryForm characters={characters} prevStep={prevStep} addMoreCharacters={addMoreCharacters} />}
     </div>
   );
 };
 
-export { CreateStoryPage };
+export default CreateStoryPage;

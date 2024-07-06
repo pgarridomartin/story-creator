@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
-import ReactDOM from 'react-dom';
-import { HomePage } from './pages/HomePage';
-import { CreateStoryPage } from './pages/CreateStoryPage';
+import HomePage from './pages/HomePage.jsx';
+import CreateStoryPage from './pages/CreateStoryPage.jsx';
 
 const App = () => {
   const [page, setPage] = useState('home');
@@ -19,6 +18,5 @@ const App = () => {
   );
 };
 
-ReactDOM.render(<App />, document.getElementById('root'));
 
 export default App;

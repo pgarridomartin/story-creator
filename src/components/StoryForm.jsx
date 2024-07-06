@@ -1,4 +1,6 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
+import '../../public/styles.css';
+
 
 const StoryForm = ({ characters, prevStep, addMoreCharacters }) => {
   const [storyPrompt, setStoryPrompt] = useState('');
@@ -10,7 +12,7 @@ const StoryForm = ({ characters, prevStep, addMoreCharacters }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log('Sending POST request to http://localhost:3001/generate-story'); // Agrega esto
+    console.log('Sending POST request to http://localhost:3001/generate-story');
     fetch('http://localhost:3001/generate-story', {
       method: 'POST',
       headers: {
@@ -55,4 +57,4 @@ const StoryForm = ({ characters, prevStep, addMoreCharacters }) => {
   );
 };
 
-export { StoryForm };
+export default StoryForm;

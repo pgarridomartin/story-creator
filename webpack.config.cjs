@@ -8,6 +8,10 @@ module.exports = {
         path: path.resolve(__dirname, 'dist'),
         filename: 'bundle.js',
     },
+    devtool: 'source-map',
+    resolve: {
+        extensions: ['.js', '.jsx'],
+    },
     module: {
         rules: [
             {
@@ -15,6 +19,9 @@ module.exports = {
                 exclude: /node_modules/,
                 use: {
                     loader: 'babel-loader',
+                    options: {
+                        presets: ['@babel/preset-env', '@babel/preset-react']
+                    }
                 },
             },
             {
@@ -40,22 +47,15 @@ module.exports = {
         }),
     ],
     devServer: {
-        static: {
-            directory: path.join(__dirname, 'public'),
-        },
+        static: path.join(__dirname, 'public'),
         compress: true,
         port: 8080,
         proxy: [
             {
                 context: ['/generate-story'],
                 target: 'http://localhost:3001',
+                changeOrigin: true,
             }
         ],
-    },
-    resolve: {
-        alias: {
-            '@': path.resolve(__dirname, 'src'), // Alias para el directorio src
-        },
-        extensions: ['.js', '.jsx'], // Extensiones que Webpack resolverá automáticamente
     },
 };
