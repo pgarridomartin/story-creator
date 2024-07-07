@@ -95,7 +95,7 @@ const CharacterCustomization = ({ onCharacterUpdate, nextStep, prevStep }) => {
                     </select>
                 </label>
                 <div className="image-selection">
-                    <div>
+                    <div className="options">
                         <p>Tipo de Piel:</p>
                         <img
                             src="/images/skin/skin1.png"
@@ -116,7 +116,7 @@ const CharacterCustomization = ({ onCharacterUpdate, nextStep, prevStep }) => {
                             onClick={() => handleImageChange('skin', 'skin3')}
                         />
                     </div>
-                    <div>
+                    <div className="options">
                         <p>Tipo de Pelo:</p>
                         <img
                             src="/images/hair/hair1.png"
@@ -137,7 +137,7 @@ const CharacterCustomization = ({ onCharacterUpdate, nextStep, prevStep }) => {
                             onClick={() => handleImageChange('hair', 'hair3')}
                         />
                     </div>
-                    <div>
+                    <div className="options">
                         <p>Color de Ojos:</p>
                         <img
                             src="/images/eyes/eyes1.png"
@@ -166,10 +166,10 @@ const CharacterCustomization = ({ onCharacterUpdate, nextStep, prevStep }) => {
             </form>
             <div className="character-preview">
                 <h2>Vista Previa del Personaje</h2>
-                <div className="character">
-                    <img src={`/images/skin/${character.skin}.png`} alt="Piel" />
-                    <img src={`/images/hair/${character.hair}.png`} alt="Pelo" />
-                    <img src={`/images/eyes/${character.eyes}.png`} alt="Ojos" />
+                <div className="character-images">
+                    <img src={`/images/skin/${character.skin}.png`} alt="Piel" className="character-image skin" />
+                    <img src={`/images/hair/${character.hair}.png`} alt="Pelo" className="character-image hair" />
+                    <img src={`/images/eyes/${character.eyes}.png`} alt="Ojos" className="character-image eyes" />
                 </div>
             </div>
         </div>

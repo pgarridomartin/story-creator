@@ -81,6 +81,7 @@ button.secondary:hover {
     display: flex;
     justify-content: flex-end;
 }
+
 .customization-options {
     display: flex;
     flex-direction: column;
@@ -90,11 +91,13 @@ button.secondary:hover {
 .options {
     display: flex;
     gap: 1rem;
+    justify-content: center; /* Centra los elementos horizontalmente */
+    margin-bottom: 1rem;
 }
 
 .options img {
-    width: 50px;
-    height: 50px;
+    width: 80px; 
+    height: 80px;  
     cursor: pointer;
     border: 2px solid transparent;
     border-radius: 50%;
@@ -112,7 +115,7 @@ button.secondary:hover {
 .character-images {
     position: relative;
     width: 200px;
-    height: 300px;
+    height: 200px;
     margin: 0 auto;
 }
 
@@ -120,4 +123,5 @@ button.secondary:hover {
     position: absolute;
     width: 100%;
     height: 100%;
+    object-fit: contain;
 }
