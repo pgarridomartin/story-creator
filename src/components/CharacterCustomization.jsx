@@ -10,7 +10,10 @@ const CharacterCustomization = ({ onCharacterUpdate, nextStep, prevStep }) => {
         role: 'protagonist',
         skin: 'skin1',
         hair: 'hair1',
-        eyes: 'eyes1'
+        eyes: 'eyes1',
+        eyebrows: 'kid_eyebrow_1_color_1',
+        nose: 'kid_nose_1',
+        mouth: 'kid_mouth_1'
     };
 
     const [character, setCharacter] = useState(() => {
@@ -158,6 +161,63 @@ const CharacterCustomization = ({ onCharacterUpdate, nextStep, prevStep }) => {
                             onClick={() => handleImageChange('eyes', 'eyes3')}
                         />
                     </div>
+                    <div className="options">
+                        <p>Tipo de Cejas:</p>
+                        <img
+                            src="/images/Eyebrows/kid_eyebrow_1_color_1.png"
+                            alt="Cejas 1"
+                            className={character.eyebrows === 'kid_eyebrow_1_color_1' ? 'selected' : ''}
+                            onClick={() => handleImageChange('eyebrows', 'kid_eyebrow_1_color_1')}
+                        />
+                        <img
+                            src="/images/Eyebrows/kid_eyebrow_1_color_2.png"
+                            alt="Cejas 2"
+                            className={character.eyebrows === 'kid_eyebrow_1_color_2' ? 'selected' : ''}
+                            onClick={() => handleImageChange('eyebrows', 'kid_eyebrow_1_color_2')}
+                        />
+                        <img
+                            src="/images/Eyebrows/kid_eyebrow_2_color_3.png"
+                            alt="Cejas 3"
+                            className={character.eyebrows === 'kid_eyebrow_2_color_3' ? 'selected' : ''}
+                            onClick={() => handleImageChange('eyebrows', 'kid_eyebrow_2_color_3')}
+                        />
+                        <img
+                            src="/images/Eyebrows/kid_eyebrow_2_color_4.png"
+                            alt="Cejas 4"
+                            className={character.eyebrows === 'kid_eyebrow_2_color_4' ? 'selected' : ''}
+                            onClick={() => handleImageChange('eyebrows', 'kid_eyebrow_2_color_4')}
+                        />
+                    </div>
+                    <div className="options">
+                        <p>Tipo de Nariz:</p>
+                        <img
+                            src="/images/Noses/kid_nose_1.png"
+                            alt="Nariz 1"
+                            className={character.nose === 'kid_nose_1' ? 'selected' : ''}
+                            onClick={() => handleImageChange('nose', 'kid_nose_1')}
+                        />
+                        <img
+                            src="/images/Noses/kid_nose_2.png"
+                            alt="Nariz 2"
+                            className={character.nose === 'kid_nose_2' ? 'selected' : ''}
+                            onClick={() => handleImageChange('nose', 'kid_nose_2')}
+                        />
+                    </div>
+                    <div className="options">
+                        <p>Tipo de Boca:</p>
+                        <img
+                            src="/images/Mouths/kid_mouth_1.png"
+                            alt="Boca 1"
+                            className={character.mouth === 'kid_mouth_1' ? 'selected' : ''}
+                            onClick={() => handleImageChange('mouth', 'kid_mouth_1')}
+                        />
+                        <img
+                            src="/images/Mouths/kid_mouth_2.png"
+                            alt="Boca 2"
+                            className={character.mouth === 'kid_mouth_2' ? 'selected' : ''}
+                            onClick={() => handleImageChange('mouth', 'kid_mouth_2')}
+                        />
+                    </div>
                 </div>
                 <div className="buttons">
                     <button type="button" className="button secondary" onClick={prevStep}>Atrás</button>
@@ -168,8 +228,12 @@ const CharacterCustomization = ({ onCharacterUpdate, nextStep, prevStep }) => {
                 <h2>Vista Previa del Personaje</h2>
                 <div className="character-images">
                     <img src={`/images/skin/${character.skin}.png`} alt="Piel" className="character-image skin" />
+                    <img src={`/images/skin/kid_base.png`} alt="Piel" className="character-image skin" />
                     <img src={`/images/hair/${character.hair}.png`} alt="Pelo" className="character-image hair" />
                     <img src={`/images/eyes/${character.eyes}.png`} alt="Ojos" className="character-image eyes" />
+                    <img src={`/images/Eyebrows/${character.eyebrows}.png`} alt="Cejas" className="character-image eyebrows" />
+                    <img src={`/images/Noses/${character.nose}.png`} alt="Nariz" className="character-image nose" />
+                    <img src={`/images/Mouths/${character.mouth}.png`} alt="Boca" className="character-image mouth" />
                 </div>
             </div>
         </div>
@@ -177,3 +241,4 @@ const CharacterCustomization = ({ onCharacterUpdate, nextStep, prevStep }) => {
 };
 
 export default CharacterCustomization;
+

@@ -20,7 +20,11 @@ app.post('/generate-story', async (req, res) => {
 
   const { characters, storyPrompt } = req.body;
 
-  const prompt = `Crea una historia corta para niños con los siguientes personajes: ${JSON.stringify(characters)}. El tema de la historia es: ${storyPrompt}. La historia debe estar en español y no contener mas de 50 palabras.`;
+  if (!characters || !Array.isArray(characters) || !storyPrompt) {
+    return res.status(400).json({ error: 'Invalid input: characters must be an array and storyPrompt must be provided' });
+  }
+
+  const prompt = `Crea una historia corta para niños con los siguientes personajes: ${JSON.stringify(characters)}. El tema de la historia es: ${storyPrompt}. La historia debe estar en español y no contener más de 50 palabras.`;
 
   try {
     const response = await openai.chat.completions.create({
@@ -33,13 +37,13 @@ app.post('/generate-story', async (req, res) => {
       temperature: 0.7,
     });
 
-    console.log('API Response:', response);
+    console.log('API Response:', JSON.stringify(response, null, 2));
 
-    if (response.data && response.data.choices && response.data.choices.length > 0) {
-      const generatedStory = response.data.choices[0].message.content.trim();
+    if (response.choices && response.choices.length > 0 && response.choices[0].message && response.choices[0].message.content) {
+      const generatedStory = response.choices[0].message.content.trim();
       res.json({ story: generatedStory });
     } else {
-      console.error('Unexpected response format from OpenAI:', response);
+      console.error('Unexpected response format from OpenAI:', JSON.stringify(response, null, 2));
       res.status(500).json({ error: 'Unexpected response format from OpenAI' });
     }
   } catch (error) {
