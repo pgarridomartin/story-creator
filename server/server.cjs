@@ -1,15 +1,25 @@
+require('dotenv').config();
+
 const express = require('express');
 const { OpenAI } = require('openai');
 const cors = require('cors');
 const bodyParser = require('body-parser');
-
-require('dotenv').config();
+const { generateImage } = require('./midjourney.cjs');
 
 const app = express();
 const port = process.env.PORT || 3001;
 
 app.use(cors());
 app.use(bodyParser.json());
+
+
+if (!process.env.OPENAI_API_KEY) {
+  throw new Error('OPENAI_API_KEY is not defined');
+}
+
+if (!process.env.MIDJOURNEY_API_KEY) {
+  throw new Error('MIDJOURNEY_API_KEY is not defined');
+}
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -49,6 +59,19 @@ app.post('/generate-story', async (req, res) => {
   } catch (error) {
     console.error('Error generating story:', error);
     res.status(500).json({ error: 'Error generating story' });
+  }
+});
+
+app.post('/generate-image', async (req, res) => {
+  const { skinColor, hairType, eyeColor } = req.body;
+  const prompt = `Generate an image of a character with ${skinColor} skin, ${hairType} hair, and ${eyeColor} eyes.`;
+
+  try {
+    const imageUrl = await generateImage(prompt);
+    res.json({ imageUrl });
+  } catch (error) {
+    console.error('Error generating image:', error);
+    res.status(500).json({ error: 'Error generating image' });
   }
 });
 

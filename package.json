@@ -7,7 +7,7 @@
   "scripts": {
     "start": "webpack serve --config webpack.config.cjs --mode development",
     "build": "webpack --config webpack.config.cjs --mode production",
-    "server": "node server.cjs"
+    "server": "node server/server.cjs"
   },
   "dependencies": {
     "axios": "^0.21.1",
