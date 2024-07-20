@@ -1,40 +1,48 @@
 import React, { useState } from 'react';
 import CharacterCustomization from '../components/CharacterCustomization.jsx';
 import StoryPrompt from '../components/StoryPrompt.jsx';
-import StoryForm from '../components/StoryForm.jsx';
 
 const CreateStoryPage = ({ navigateTo }) => {
+  const [step, setStep] = useState(1);
   const [characters, setCharacters] = useState([]);
-  const [currentStep, setCurrentStep] = useState('characterForm');
+  const [story, setStory] = useState('');
 
-  const addCharacter = (character) => {
-    setCharacters([...characters, character]);
+  const handleCharacterUpdate = (updatedCharacter) => {
+    setCharacters([updatedCharacter]);
   };
 
   const nextStep = () => {
-    if (currentStep === 'characterForm') {
-      setCurrentStep('storyForm');
-    } 
+    setStep(step + 1);
   };
 
   const prevStep = () => {
-    if (currentStep === 'storyForm') {
-      setCurrentStep('characterForm');
-    } else if (currentStep === 'characterForm') {
-      navigateTo('home');
-    }
+    setStep(step - 1);
   };
-
-  const addMoreCharacters = () => {
-    setCurrentStep('characterForm');
-  };
-
-  console.log(`Current step: ${currentStep}`);
 
   return (
-    <div className="container">
-      {currentStep === 'characterForm' && <CharacterCustomization nextStep={nextStep} prevStep={prevStep} addCharacter={addCharacter} />}
-      {currentStep === 'storyForm' && <StoryForm characters={characters} prevStep={prevStep} addMoreCharacters={addMoreCharacters} />}
+    <div>
+      {step === 1 && (
+        <CharacterCustomization
+          onCharacterUpdate={handleCharacterUpdate}
+          nextStep={nextStep}
+          prevStep={prevStep}
+        />
+      )}
+      {step === 2 && (
+        <StoryPrompt
+          characters={characters}
+          nextStep={nextStep}
+          prevStep={prevStep}
+          setStory={setStory}
+        />
+      )}
+      {step === 3 && (
+        <div>
+          <h2>Historia Generada</h2>
+          <p>{story}</p>
+          <button onClick={() => navigateTo('home')}>Volver al Inicio</button>
+        </div>
+      )}
     </div>
   );
 };

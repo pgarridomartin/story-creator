@@ -12,7 +12,6 @@ const port = process.env.PORT || 3001;
 app.use(cors());
 app.use(bodyParser.json());
 
-
 if (!process.env.OPENAI_API_KEY) {
   throw new Error('OPENAI_API_KEY is not defined');
 }
@@ -34,7 +33,7 @@ app.post('/generate-story', async (req, res) => {
     return res.status(400).json({ error: 'Invalid input: characters must be an array and storyPrompt must be provided' });
   }
 
-  const characterDescriptions = characters.map(char => `${char.name}, a ${char.gender}, age ${char.age}`).join(', ');
+  const characterDescriptions = characters.map(char => `${char.name}, a ${char.gender}, age ${char.age}, with ${char.skin} skin, ${char.hair} hair, and ${char.eyes} eyes`).join(', ');
   const prompt = `Crea una historia corta para niños con los siguientes personajes: ${characterDescriptions}. El tema de la historia es: ${storyPrompt}. La historia debe estar en español y no contener más de 50 palabras.`;
 
   console.log('Prompt sent to ChatGPT:', prompt); // Log the prompt
@@ -65,20 +64,24 @@ app.post('/generate-story', async (req, res) => {
   }
 });
 
-
 app.post('/generate-image', async (req, res) => {
   const { skinColor, hairType, eyeColor } = req.body;
-  const prompt = `Generate an image of a character with ${skinColor} skin, ${hairType} hair, and ${eyeColor} eyes.`;
+  const prompt = `Generate an image of a character with ${skinColor} skin, ${hairType} hair, and ${eyeColor} eyes`;
+
+  console.log('Prompt sent to MidJourney:', prompt); // Log the prompt
 
   try {
     const imageUrl = await generateImage(prompt);
+    console.log('Generated Image URL:', imageUrl); // Log the image URL
     res.json({ imageUrl });
   } catch (error) {
-    console.error('Error generating image:', error);
+    console.error('Error generating image:', error.message); // Log error message
     res.status(500).json({ error: 'Error generating image' });
   }
 });
 
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
+
+  
 });
