@@ -34,7 +34,10 @@ app.post('/generate-story', async (req, res) => {
     return res.status(400).json({ error: 'Invalid input: characters must be an array and storyPrompt must be provided' });
   }
 
-  const prompt = `Crea una historia corta para niños con los siguientes personajes: ${JSON.stringify(characters)}. El tema de la historia es: ${storyPrompt}. La historia debe estar en español y no contener más de 50 palabras.`;
+  const characterDescriptions = characters.map(char => `${char.name}, a ${char.gender}, age ${char.age}`).join(', ');
+  const prompt = `Crea una historia corta para niños con los siguientes personajes: ${characterDescriptions}. El tema de la historia es: ${storyPrompt}. La historia debe estar en español y no contener más de 50 palabras.`;
+
+  console.log('Prompt sent to ChatGPT:', prompt); // Log the prompt
 
   try {
     const response = await openai.chat.completions.create({
@@ -61,6 +64,7 @@ app.post('/generate-story', async (req, res) => {
     res.status(500).json({ error: 'Error generating story' });
   }
 });
+
 
 app.post('/generate-image', async (req, res) => {
   const { skinColor, hairType, eyeColor } = req.body;

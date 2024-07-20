@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import CharacterCustomization from '../components/CharacterCustomization.jsx';
+import StoryPrompt from '../components/StoryPrompt.jsx';
 import StoryForm from '../components/StoryForm.jsx';
 
 const CreateStoryPage = ({ navigateTo }) => {
