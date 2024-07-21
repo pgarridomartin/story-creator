@@ -1,26 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import '../../public/styles.css';
 import ImageSelection from './ImageSelection';
-import {
-  skinDescriptions,
-  hairDescriptions,
-  eyeDescriptions,
-  eyebrowDescriptions,
-  noseDescriptions,
-  mouthDescriptions
-} from '../utils/descriptions';
-
-const generatePrompt = (character) => {
-  const skinDescription = skinDescriptions[character.skin] || "default skin";
-  const hairDescription = hairDescriptions[character.hair] || "default hair";
-  const eyeDescription = eyeDescriptions[character.eyes] || "default eyes";
-  const eyebrowDescription = eyebrowDescriptions[character.eyebrows] || "default eyebrows";
-  const noseDescription = noseDescriptions[character.nose] || "default nose";
-  const mouthDescription = mouthDescriptions[character.mouth] || "default mouth";
-
-  return `A character with ${skinDescription}, ${hairDescription}, ${eyeDescription}, ${eyebrowDescription}, ${noseDescription}, and ${mouthDescription}, disney style, smiling, colorful, cute, walking on the street.`;
-};
 
 const CharacterCustomization = ({ onCharacterUpdate, nextStep, prevStep }) => {
   const initialCharacterState = {
@@ -28,7 +8,7 @@ const CharacterCustomization = ({ onCharacterUpdate, nextStep, prevStep }) => {
     gender: '',
     age: '',
     relationship: '',
-    role: 'protagonist',
+    role: '',
     skin: 'skin1',
     hair: 'hair1',
     eyes: 'eyes1',
@@ -41,46 +21,32 @@ const CharacterCustomization = ({ onCharacterUpdate, nextStep, prevStep }) => {
     const savedCharacter = localStorage.getItem('character');
     return savedCharacter ? JSON.parse(savedCharacter) : initialCharacterState;
   });
-  const [imageUrl, setImageUrl] = useState('');
 
   useEffect(() => {
     localStorage.setItem('character', JSON.stringify(character));
+    if (onCharacterUpdate) {
+      onCharacterUpdate(character);
+    }
+    console.log('Character updated:', character); // Log character info
   }, [character]);
-
-  useEffect(() => {
-    onCharacterUpdate(character);
-  }, []);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setCharacter({
-      ...character,
+    setCharacter((prevCharacter) => ({
+      ...prevCharacter,
       [name]: value
-    });
+    }));
   };
 
   const handleImageChange = (type, value) => {
-    setCharacter({
-      ...character,
+    setCharacter((prevCharacter) => ({
+      ...prevCharacter,
       [type]: value
-    });
+    }));
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    const prompt = generatePrompt(character);
-    console.log('Generated Image Prompt:', prompt); // Log the prompt for image generation
-    try {
-      const response = await axios.post('http://localhost:3001/generate-image', { 
-        skinColor: character.skin,
-        hairType: character.hair,
-        eyeColor: character.eyes
-      });
-      setImageUrl(response.data.imageUrl);
-      console.log('Generated Image URL:', response.data.imageUrl); // Log the generated image URL
-    } catch (error) {
-      console.error('Error generating image:', error);
-    }
     nextStep();
   };
 
@@ -129,6 +95,7 @@ const CharacterCustomization = ({ onCharacterUpdate, nextStep, prevStep }) => {
         <label>
           Rol:
           <select name="role" value={character.role} onChange={handleInputChange} required>
+            <option value="">Selecciona</option>
             <option value="protagonist">Protagonista</option>
             <option value="secondary">Secundario</option>
           </select>
@@ -139,12 +106,6 @@ const CharacterCustomization = ({ onCharacterUpdate, nextStep, prevStep }) => {
           <button type="submit" className="button">Guardar y Siguiente</button>
         </div>
       </form>
-      {imageUrl && (
-        <div className="character-preview">
-          <h2>Imagen Generada del Personaje</h2>
-          <img src={imageUrl} alt="Generated Character" />
-        </div>
-      )}
       <div className="character-preview">
         <h2>Vista Previa del Personaje</h2>
         <div className="character-images">

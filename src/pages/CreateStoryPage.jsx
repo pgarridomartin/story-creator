@@ -5,22 +5,26 @@ import StoryPrompt from '../components/StoryPrompt.jsx';
 const CreateStoryPage = ({ navigateTo }) => {
   const [step, setStep] = useState(1);
   const [characters, setCharacters] = useState([]);
-  const [story, setStory] = useState('');
+  const [generatedStory, setGeneratedStory] = useState('');
 
-  const handleCharacterUpdate = (updatedCharacter) => {
-    setCharacters([updatedCharacter]);
-  };
+  const nextStep = () => setStep(step + 1);
+  const prevStep = () => setStep(step - 1);
 
-  const nextStep = () => {
-    setStep(step + 1);
-  };
-
-  const prevStep = () => {
-    setStep(step - 1);
+  const handleCharacterUpdate = (character) => {
+    setCharacters((prevCharacters) => {
+      const existingCharacterIndex = prevCharacters.findIndex((c) => c.name === character.name);
+      if (existingCharacterIndex !== -1) {
+        const updatedCharacters = [...prevCharacters];
+        updatedCharacters[existingCharacterIndex] = character;
+        return updatedCharacters;
+      } else {
+        return [...prevCharacters, character];
+      }
+    });
   };
 
   return (
-    <div>
+    <div className="create-story-page">
       {step === 1 && (
         <CharacterCustomization
           onCharacterUpdate={handleCharacterUpdate}
@@ -33,14 +37,14 @@ const CreateStoryPage = ({ navigateTo }) => {
           characters={characters}
           nextStep={nextStep}
           prevStep={prevStep}
-          setStory={setStory}
+          setGeneratedStory={setGeneratedStory}
         />
       )}
       {step === 3 && (
         <div>
           <h2>Historia Generada</h2>
-          <p>{story}</p>
-          <button onClick={() => navigateTo('home')}>Volver al Inicio</button>
+          <p>{generatedStory}</p>
+          <button onClick={() => navigateTo('home')}>Volver a la página de inicio</button>
         </div>
       )}
     </div>

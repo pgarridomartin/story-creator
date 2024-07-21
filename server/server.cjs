@@ -27,20 +27,57 @@ const openai = new OpenAI({
 app.post('/generate-story', async (req, res) => {
   console.log('Received POST request to /generate-story');
 
-  const { characters, storyPrompt } = req.body;
+  const { characters, storyTitle, storyPrompt } = req.body;
 
-  if (!characters || !Array.isArray(characters) || !storyPrompt) {
-    return res.status(400).json({ error: 'Invalid input: characters must be an array and storyPrompt must be provided' });
+  if (!characters || !Array.isArray(characters) || !storyPrompt || !storyTitle) {
+    return res.status(400).json({ error: 'Invalid input: characters must be an array, storyPrompt and storyTitle must be provided' });
   }
 
-  const characterDescriptions = characters.map(char => `${char.name}, a ${char.gender}, age ${char.age}, with ${char.skin} skin, ${char.hair} hair, and ${char.eyes} eyes`).join(', ');
-  const prompt = `Crea una historia corta para niños con los siguientes personajes: ${characterDescriptions}. El tema de la historia es: ${storyPrompt}. La historia debe estar en español y no contener más de 50 palabras.`;
+  const protagonistDescriptions = characters.filter(char => char.role === 'protagonist').map(char => {
+    const skinDescription = char.skin || "default skin";
+    const hairDescription = char.hair || "default hair";
+    const eyeDescription = char.eyes || "default eyes";
+    const eyebrowDescription = char.eyebrows || "default eyebrows";
+    const noseDescription = char.nose || "default nose";
+    const mouthDescription = char.mouth || "default mouth";
 
-  console.log('Prompt sent to ChatGPT:', prompt); // Log the prompt
+    console.log('Protagonist:', char); // Log protagonist info
+
+    return `${char.name}, a ${char.gender}, age ${char.age}, with ${skinDescription}, ${hairDescription}, ${eyeDescription}, ${eyebrowDescription}, ${noseDescription}, and ${mouthDescription}`;
+  }).join(', ');
+
+  const secondaryDescriptions = characters.filter(char => char.role === 'secondary').map(char => {
+    const skinDescription = char.skin || "default skin";
+    const hairDescription = char.hair || "default hair";
+    const eyeDescription = char.eyes || "default eyes";
+    const eyebrowDescription = char.eyebrows || "default eyebrows";
+    const noseDescription = char.nose || "default nose";
+    const mouthDescription = char.mouth || "default mouth";
+
+    console.log('Secondary character:', char); // Log secondary character info
+
+    return `${char.name}, a ${char.gender}, age ${char.age}, with ${skinDescription}, ${hairDescription}, ${eyeDescription}, ${eyebrowDescription}, ${noseDescription}, and ${mouthDescription}`;
+  }).join(', ');
+
+  const prompt = `Por favor, genera un cuento infantil personalizado basado en los siguientes parámetros proporcionados por el usuario:
+
+1. Título del cuento: ${storyTitle}
+2. Descripción de los personajes:
+   - Protagonistas: ${protagonistDescriptions}
+   - Personajes secundarios: ${secondaryDescriptions}
+3. Tema o mensaje del cuento: ${storyPrompt}
+
+Estructura del cuento: Introducción, desarrollo, clímax, resolución, conclusión.
+
+Asegúrate de que el cuento esté dividido en secciones claras, identificadas como "Sección 1", "Sección 2", etc., con un título y una descripción detallada de cada escena, para que estas puedan ser usadas como prompts para generar ilustraciones. Cada sección debe tener una descripción vívida del escenario y las acciones principales.
+
+Genera una historia fluida y coherente con estos elementos.`;
+
+  console.log('Prompt sent to ChatGPT:', prompt);
 
   try {
     const response = await openai.chat.completions.create({
-      model: "gpt-3.5-turbo",
+      model: "gpt-4o-mini",
       messages: [
         { role: "system", content: "Eres un asistente creativo para generar historias para niños." },
         { role: "user", content: prompt }
@@ -53,7 +90,13 @@ app.post('/generate-story', async (req, res) => {
 
     if (response.choices && response.choices.length > 0 && response.choices[0].message && response.choices[0].message.content) {
       const generatedStory = response.choices[0].message.content.trim();
-      res.json({ story: generatedStory });
+      
+      // Extract prompts for MidJourney from the generated story
+      const imagePrompts = extractImagePrompts(generatedStory); // Implement this function based on your requirements
+
+      const imageUrls = await Promise.all(imagePrompts.map(prompt => generateImage(prompt)));
+
+      res.json({ story: generatedStory, images: imageUrls });
     } else {
       console.error('Unexpected response format from OpenAI:', JSON.stringify(response, null, 2));
       res.status(500).json({ error: 'Unexpected response format from OpenAI' });
@@ -64,24 +107,12 @@ app.post('/generate-story', async (req, res) => {
   }
 });
 
-app.post('/generate-image', async (req, res) => {
-  const { skinColor, hairType, eyeColor } = req.body;
-  const prompt = `Generate an image of a character with ${skinColor} skin, ${hairType} hair, and ${eyeColor} eyes`;
-
-  console.log('Prompt sent to MidJourney:', prompt); // Log the prompt
-
-  try {
-    const imageUrl = await generateImage(prompt);
-    console.log('Generated Image URL:', imageUrl); // Log the image URL
-    res.json({ imageUrl });
-  } catch (error) {
-    console.error('Error generating image:', error.message); // Log error message
-    res.status(500).json({ error: 'Error generating image' });
-  }
-});
-
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
-
-  
 });
+
+// Function to extract image prompts from the generated story
+function extractImagePrompts(generatedStory) {
+  // Implement your logic to extract prompts for images
+  return ["Prompt 1", "Prompt 2"]; // Replace with actual prompts
+}
