@@ -70,9 +70,17 @@ const StoryPrompt = ({ characters, nextStep, prevStep, setGeneratedStory }) => {
     try {
       const response = await axios.post('http://localhost:3001/generate-story', { characters, storyTitle, storyPrompt });
       setGeneratedStory(response.data.story);
-      console.log('Generated Story:', response.data.story); // Logging the story
+      console.log('Generated Story:', response.data.story); // Log the generated story
+
+      // Generate image prompts based on the generated story sections
+      const imagePrompts = extractImagePrompts(response.data.story);
+      const imageResponses = await Promise.all(imagePrompts.map(prompt => axios.post('http://localhost:3001/generate-image', { prompt })));
+      const imageUrls = imageResponses.map(response => response.data.imageUrl);
+
+      console.log('Generated Image URLs:', imageUrls); // Log the generated image URLs
+
     } catch (error) {
-      console.error('Error generating story:', error);
+      console.error('Error generating story or images:', error);
     }
     nextStep();
   };
@@ -106,8 +114,18 @@ const StoryPrompt = ({ characters, nextStep, prevStep, setGeneratedStory }) => {
           <button type="submit" className="button">Generar Historia</button>
         </div>
       </form>
+      <div className="story-preview">
+        <h2>Historia Generada</h2>
+        <p>{story}</p>
+      </div>
     </div>
   );
 };
+
+// Function to extract image prompts from the generated story
+function extractImagePrompts(generatedStory) {
+  // Implement your logic to extract prompts for images
+  return ["Prompt 1", "Prompt 2"]; // Replace with actual prompts
+}
 
 export default StoryPrompt;

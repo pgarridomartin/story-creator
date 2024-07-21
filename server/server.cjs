@@ -5,6 +5,7 @@ const { OpenAI } = require('openai');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const { generateImage } = require('./midjourney.cjs');
+const extractImagePrompts = require('./utils/extractImagePrompts.jsx');
 
 const app = express();
 const port = process.env.PORT || 3001;
@@ -92,7 +93,7 @@ Genera una historia fluida y coherente con estos elementos.`;
       const generatedStory = response.choices[0].message.content.trim();
       
       // Extract prompts for MidJourney from the generated story
-      const imagePrompts = extractImagePrompts(generatedStory); // Implement this function based on your requirements
+      const imagePrompts = extractImagePrompts(generatedStory);
 
       const imageUrls = await Promise.all(imagePrompts.map(prompt => generateImage(prompt)));
 
@@ -110,9 +111,3 @@ Genera una historia fluida y coherente con estos elementos.`;
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
 });
-
-// Function to extract image prompts from the generated story
-function extractImagePrompts(generatedStory) {
-  // Implement your logic to extract prompts for images
-  return ["Prompt 1", "Prompt 2"]; // Replace with actual prompts
-}
