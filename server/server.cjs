@@ -5,7 +5,7 @@ const { OpenAI } = require('openai');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const { generateImage } = require('./midjourney.cjs');
-const extractImagePrompts = require('./utils/extractImagePrompts.jsx');
+const extractImagePrompts = require('../utils/extractImagePrompts');
 
 const app = express();
 const port = process.env.PORT || 3001;
@@ -70,7 +70,7 @@ app.post('/generate-story', async (req, res) => {
 
 Estructura del cuento: Introducción, desarrollo, clímax, resolución, conclusión.
 
-Asegúrate de que el cuento esté dividido en secciones claras, identificadas como "Sección 1", "Sección 2", etc., con un título y una descripción detallada de cada escena, para que estas puedan ser usadas como prompts para generar ilustraciones. Cada sección debe tener una descripción vívida del escenario y las acciones principales.
+Asegúrate de que el cuento esté dividido en páginas claras, conteniendo cada página entre 25 y 50 palabras, identificadas como "Página 1", "Página 2", etc., con un título y una descripción detallada de cada escena, para que estas puedan ser usadas como prompts para generar ilustraciones. Cada página debe tener una descripción vívida del escenario y las acciones principales.
 
 Genera una historia fluida y coherente con estos elementos.`;
 
@@ -95,7 +95,13 @@ Genera una historia fluida y coherente con estos elementos.`;
       // Extract prompts for MidJourney from the generated story
       const imagePrompts = extractImagePrompts(generatedStory);
 
-      const imageUrls = await Promise.all(imagePrompts.map(prompt => generateImage(prompt)));
+      // Generate images
+      const imageUrls = await Promise.all(imagePrompts.map(async prompt => {
+        console.log('Prompt sent to MidJourney:', prompt);
+        const imageUrl = await generateImage(prompt);
+        console.log('Generated Image URL:', imageUrl);
+        return imageUrl;
+      }));
 
       res.json({ story: generatedStory, images: imageUrls });
     } else {
