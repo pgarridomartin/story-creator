@@ -1,18 +1,13 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import {
-  skinDescriptions,
-  hairDescriptions,
-  eyeDescriptions,
-  eyebrowDescriptions,
-  noseDescriptions,
-  mouthDescriptions
-} from '../utils/descriptions.jsx';
+import { generateStoryPrompt } from '../utils/generateStoryPrompt.cjs';
 
-const StoryPrompt = ({ characters, nextStep, prevStep, setGeneratedStory }) => {
+const StoryPrompt = ({ characters, nextStep, prevStep }) => {
   const [storyTitle, setStoryTitle] = useState('');
   const [storyPrompt, setStoryPrompt] = useState('');
   const [story, setStory] = useState('');
+  const [images, setImages] = useState([]);
+  const [imagePrompts, setImagePrompts] = useState([]);
 
   const handleStoryTitleChange = (e) => {
     setStoryTitle(e.target.value);
@@ -24,21 +19,19 @@ const StoryPrompt = ({ characters, nextStep, prevStep, setGeneratedStory }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const prompt = generateStoryPrompt(storyTitle, characters, storyPrompt);
+    console.log('Generated Prompt:', prompt);
     try {
-      const response = await axios.post('http://localhost:3001/generate-story', { characters, storyTitle, storyPrompt });
+      const response = await axios.post('http://localhost:3001/generate-story', { storyTitle, characters, storyPrompt });
       setStory(response.data.story);
-      setGeneratedStory(response.data.story);
-      console.log('Generated Story:', response.data.story); // Log the generated story
+      setImages(response.data.images);
 
-      // Generate image prompts based on the generated story pages
-      const imagePrompts = response.data.imagePrompts;
-      const imageResponses = await Promise.all(imagePrompts.map(prompt => axios.post('http://localhost:3001/generate-image', { prompt })));
-      const imageUrls = imageResponses.map(response => response.data.imageUrl);
-
-      console.log('Generated Image URLs:', imageUrls); // Log the generated image URLs
-
+      // Log the image prompts
+      const prompts = response.data.imagePrompts;
+      setImagePrompts(prompts);
+      console.log('Image Prompts to be sent to MidJourney:', prompts);
     } catch (error) {
-      console.error('Error generating story or images:', error);
+      console.error('Error generating story:', error);
     }
     nextStep();
   };
@@ -76,6 +69,20 @@ const StoryPrompt = ({ characters, nextStep, prevStep, setGeneratedStory }) => {
         <div className="story-preview">
           <h2>Historia Generada</h2>
           <p>{story}</p>
+          {images.map((image, index) => (
+            <div key={index}>
+              <h3>Imagen {index + 1}</h3>
+              <img src={image} alt={`Imagen ${index + 1}`} />
+            </div>
+          ))}
+        </div>
+      )}
+      {imagePrompts.length > 0 && (
+        <div className="image-prompts">
+          <h2>Prompts para MidJourney</h2>
+          {imagePrompts.map((prompt, index) => (
+            <p key={index}>{prompt}</p>
+          ))}
         </div>
       )}
     </div>
