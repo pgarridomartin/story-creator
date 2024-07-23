@@ -1,7 +1,14 @@
 const generateStoryPrompt = (title, characters, storyPrompt) => {
-    const protagonistDescriptions = characters.filter(char => char.role === 'protagonist').map(char => `${char.name}, a ${char.gender}, age ${char.age}, with ${char.skin} skin, ${char.hair} hair, ${char.eyes} eyes, ${char.eyebrows} eyebrows, ${char.nose} nose, and ${char.mouth} mouth`).join(', ');
-    const secondaryDescriptions = characters.filter(char => char.role === 'secondary').map(char => `${char.name}, a ${char.gender}, age ${char.age}, with ${char.skin} skin, ${char.hair} hair, ${char.eyes} eyes, ${char.eyebrows} eyebrows, ${char.nose} nose, and ${char.mouth} mouth`).join(', ');
+    const protagonistDescriptions = characters
+      .filter(char => char.role === 'protagonist')
+      .map(char => `${char.name}, a ${char.gender}, age ${char.age}, with ${char.skin} skin, ${char.hair} hair, and ${char.eyes} eyes`)
+      .join(', ');
   
+    const secondaryDescriptions = characters
+      .filter(char => char.role === 'secondary')
+      .map(char => `${char.name}, a ${char.gender}, age ${char.age}, with ${char.skin} skin, ${char.hair} hair, and ${char.eyes} eyes`)
+      .join(', ');
+      
     return `Por favor, genera un cuento infantil personalizado basado en los siguientes parámetros proporcionados por el usuario (solo texto, no imágenes):
   
   1. Título del cuento: ${title}

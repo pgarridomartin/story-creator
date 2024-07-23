@@ -1,4 +1,5 @@
 require('dotenv').config();
+
 const express = require('express');
 const { OpenAI } = require('openai');
 const cors = require('cors');
@@ -30,8 +31,8 @@ app.post('/generate-story', async (req, res) => {
 
   const { storyTitle, characters, storyPrompt } = req.body;
 
-  if (!characters || !Array.isArray(characters) || !storyPrompt || !storyTitle) {
-    return res.status(400).json({ error: 'Invalid input: characters must be an array and storyTitle and storyPrompt must be provided' });
+  if (!storyTitle || !characters || !Array.isArray(characters) || !storyPrompt) {
+    return res.status(400).json({ error: 'Invalid input: storyTitle, characters must be an array, and storyPrompt must be provided' });
   }
 
   const prompt = generateStoryPrompt(storyTitle, characters, storyPrompt);
@@ -50,25 +51,19 @@ app.post('/generate-story', async (req, res) => {
 
     if (response.choices && response.choices.length > 0 && response.choices[0].message && response.choices[0].message.content) {
       const generatedStory = response.choices[0].message.content.trim();
-      console.log('Generated Story:', generatedStory);
+      console.log('Generated story:', generatedStory);
+
       const imagePrompts = extractImagePrompts(generatedStory);
-      console.log('Extracted Image Prompts:', imagePrompts);
+      console.log('Extracted prompts:', imagePrompts);
 
-      // Generate images using the extracted prompts
-      const imageUrls = [];
-      for (const imagePrompt of imagePrompts) {
-        console.log('Prompt to be sent to MidJourney:', imagePrompt); // Log the prompt before sending
-        try {
-          const imageUrl = await generateImage(imagePrompt);
-          imageUrls.push(imageUrl);
-        } catch (error) {
-          console.error('Error generating image:', error);
-        }
-      }
+      const imageUrls = await Promise.all(imagePrompts.map(async (prompt) => {
+        console.log(`Prompt sent to MidJourney: ${prompt}`);
+        return await generateImage(prompt);
+      }));
 
-      res.json({ story: generatedStory, images: imageUrls, imagePrompts: imagePrompts });
+      res.json({ story: generatedStory, images: imageUrls });
     } else {
-      console.error('Unexpected response format from OpenAI');
+      console.error('Unexpected response format from OpenAI:', JSON.stringify(response, null, 2));
       res.status(500).json({ error: 'Unexpected response format from OpenAI' });
     }
   } catch (error) {

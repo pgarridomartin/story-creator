@@ -6,8 +6,7 @@ const StoryPrompt = ({ characters, nextStep, prevStep }) => {
   const [storyTitle, setStoryTitle] = useState('');
   const [storyPrompt, setStoryPrompt] = useState('');
   const [story, setStory] = useState('');
-  const [images, setImages] = useState([]);
-  const [imagePrompts, setImagePrompts] = useState([]);
+  const [prompts, setPrompts] = useState([]);
 
   const handleStoryTitleChange = (e) => {
     setStoryTitle(e.target.value);
@@ -19,17 +18,11 @@ const StoryPrompt = ({ characters, nextStep, prevStep }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const prompt = generateStoryPrompt(storyTitle, characters, storyPrompt);
-    console.log('Generated Prompt:', prompt);
     try {
       const response = await axios.post('http://localhost:3001/generate-story', { storyTitle, characters, storyPrompt });
       setStory(response.data.story);
-      setImages(response.data.images);
-
-      // Log the image prompts
-      const prompts = response.data.imagePrompts;
-      setImagePrompts(prompts);
-      console.log('Image Prompts to be sent to MidJourney:', prompts);
+      setPrompts(response.data.prompts);
+      console.log('Prompts to be sent to MidJourney:', response.data.prompts);
     } catch (error) {
       console.error('Error generating story:', error);
     }
@@ -69,20 +62,6 @@ const StoryPrompt = ({ characters, nextStep, prevStep }) => {
         <div className="story-preview">
           <h2>Historia Generada</h2>
           <p>{story}</p>
-          {images.map((image, index) => (
-            <div key={index}>
-              <h3>Imagen {index + 1}</h3>
-              <img src={image} alt={`Imagen ${index + 1}`} />
-            </div>
-          ))}
-        </div>
-      )}
-      {imagePrompts.length > 0 && (
-        <div className="image-prompts">
-          <h2>Prompts para MidJourney</h2>
-          {imagePrompts.map((prompt, index) => (
-            <p key={index}>{prompt}</p>
-          ))}
         </div>
       )}
     </div>
