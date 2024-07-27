@@ -1,5 +1,4 @@
 require('dotenv').config();
-
 const express = require('express');
 const { OpenAI } = require('openai');
 const cors = require('cors');
@@ -27,16 +26,13 @@ const openai = new OpenAI({
 });
 
 app.post('/generate-story', async (req, res) => {
-  console.log('Received POST request to /generate-story');
-
-  const { storyTitle, characters, storyPrompt } = req.body;
-
-  if (!storyTitle || !characters || !Array.isArray(characters) || !storyPrompt) {
-    return res.status(400).json({ error: 'Invalid input: storyTitle, characters must be an array, and storyPrompt must be provided' });
+  const { characters, storyTitle, storyPrompt } = req.body;
+  if (!characters || !storyTitle || !storyPrompt) {
+    return res.status(400).json({ error: 'Invalid input: characters, storyTitle, and storyPrompt must be provided' });
   }
 
-  const prompt = generateStoryPrompt(storyTitle, characters, storyPrompt);
-  console.log('Prompt sent to ChatGPT:', prompt);
+  const prompt = generateStoryPrompt(characters, storyTitle, storyPrompt);
+  console.log('Prompt sent to ChatGPT:', prompt); // Log the prompt
 
   try {
     const response = await openai.chat.completions.create({
@@ -49,26 +45,35 @@ app.post('/generate-story', async (req, res) => {
       temperature: 0.7,
     });
 
-    if (response.choices && response.choices.length > 0 && response.choices[0].message && response.choices[0].message.content) {
-      const generatedStory = response.choices[0].message.content.trim();
-      console.log('Generated story:', generatedStory);
-
-      const imagePrompts = extractImagePrompts(generatedStory);
-      console.log('Extracted prompts:', imagePrompts);
-
-      const imageUrls = await Promise.all(imagePrompts.map(async (prompt) => {
-        console.log(`Prompt sent to MidJourney: ${prompt}`);
-        return await generateImage(prompt);
-      }));
-
-      res.json({ story: generatedStory, images: imageUrls });
-    } else {
-      console.error('Unexpected response format from OpenAI:', JSON.stringify(response, null, 2));
-      res.status(500).json({ error: 'Unexpected response format from OpenAI' });
-    }
+    const generatedStory = response.choices[0].message.content.trim();
+    console.log('Generated story:', generatedStory); // Log the generated story
+    res.json({ story: generatedStory });
   } catch (error) {
     console.error('Error generating story:', error);
     res.status(500).json({ error: 'Error generating story' });
+  }
+});
+
+app.post('/generate-images', async (req, res) => {
+  const { story } = req.body;
+  if (!story) {
+    return res.status(400).json({ error: 'Story must be provided to generate image prompts' });
+  }
+
+  const imagePrompts = extractImagePrompts(story);
+  console.log('Extracted image prompts:', imagePrompts); // Log extracted prompts
+
+  try {
+    const imageUrls = [];
+    for (const prompt of imagePrompts) {
+      console.log('Generating image with prompt:', prompt); // Log each prompt before generating image
+      const imageUrl = await generateImage(prompt);
+      imageUrls.push(imageUrl);
+    }
+    res.json({ imageUrls });
+  } catch (error) {
+    console.error('Error generating images:', error);
+    res.status(500).json({ error: 'Error generating images' });
   }
 });
 

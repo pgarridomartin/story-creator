@@ -1,32 +1,42 @@
+// src/components/StoryPrompt.jsx
 import React, { useState } from 'react';
 import axios from 'axios';
-import { generateStoryPrompt } from '../utils/generateStoryPrompt.cjs';
 
 const StoryPrompt = ({ characters, nextStep, prevStep }) => {
   const [storyTitle, setStoryTitle] = useState('');
   const [storyPrompt, setStoryPrompt] = useState('');
   const [story, setStory] = useState('');
-  const [prompts, setPrompts] = useState([]);
-
-  const handleStoryTitleChange = (e) => {
-    setStoryTitle(e.target.value);
-  };
+  const [imageUrls, setImageUrls] = useState([]);
 
   const handleStoryPromptChange = (e) => {
     setStoryPrompt(e.target.value);
   };
 
+  const handleStoryTitleChange = (e) => {
+    setStoryTitle(e.target.value);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://localhost:3001/generate-story', { storyTitle, characters, storyPrompt });
+      const response = await axios.post('http://localhost:3001/generate-story', { characters, storyTitle, storyPrompt });
       setStory(response.data.story);
-      setPrompts(response.data.prompts);
-      console.log('Prompts to be sent to MidJourney:', response.data.prompts);
     } catch (error) {
       console.error('Error generating story:', error);
     }
-    nextStep();
+  };
+
+  const generateImages = async () => {
+    if (!story) {
+      console.error('No story available to generate image prompts');
+      return;
+    }
+    try {
+      const response = await axios.post('http://localhost:3001/generate-images', { story });
+      setImageUrls(response.data.imageUrls);
+    } catch (error) {
+      console.error('Error generating images:', error);
+    }
   };
 
   return (
@@ -62,6 +72,15 @@ const StoryPrompt = ({ characters, nextStep, prevStep }) => {
         <div className="story-preview">
           <h2>Historia Generada</h2>
           <p>{story}</p>
+          <button className="button" onClick={generateImages}>Generar Imágenes</button>
+        </div>
+      )}
+      {imageUrls.length > 0 && (
+        <div className="image-previews">
+          <h2>Imágenes Generadas</h2>
+          {imageUrls.map((url, index) => (
+            <img key={index} src={url} alt={`Generated ${index + 1}`} />
+          ))}
         </div>
       )}
     </div>

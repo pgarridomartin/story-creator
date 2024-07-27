@@ -1,12 +1,18 @@
+// src/utils/extractImagePrompts.cjs
 const extractImagePrompts = (story) => {
-  const regex = /Descripción:\s*(.*?)\s*(Página|$)/gs;
-  let match;
-  const prompts = [];
-  while ((match = regex.exec(story)) !== null) {
-    prompts.push(match[1].trim());
+  const pages = story.match(/\*\*Página \d+:\*\*([\s\S]*?)(?=\*\*Página \d+:\*\*|$)/g);
+  if (!pages) {
+    console.error('No pages found in the story');
+    return [];
   }
-  console.log('Extracted prompts:', prompts);
-  return prompts;
+
+  const imagePrompts = pages.map(page => {
+    const match = page.match(/- Descripción:\s*([\s\S]*)/);
+    return match ? match[1].trim() : null;
+  }).filter(prompt => prompt !== null);
+
+  console.log('Extracted image prompts:', imagePrompts); // Log extracted prompts
+  return imagePrompts;
 };
 
 module.exports = { extractImagePrompts };
