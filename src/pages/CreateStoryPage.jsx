@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import CharacterCustomization from '../components/CharacterCustomization.jsx';
 import StoryPrompt from '../components/StoryPrompt.jsx';
-import StoryDisplay from '../components/StoryDisplay.jsx'; // Importar StoryDisplay
+import StoryDisplay from '../components/StoryDisplay.jsx';
+import CharacterSummary from '../components/CharacterSummary.jsx'; // Importar CharacterSummary
 
 const CreateStoryPage = ({ navigateTo }) => {
   const [step, setStep] = useState(1);
@@ -33,7 +34,7 @@ const CreateStoryPage = ({ navigateTo }) => {
         body: JSON.stringify({ story: generatedStory, characters }),
       });
       const data = await response.json();
-      setImages(data.images || []);
+      setImages(data.images || []); // Asegurarse de que images es un array
     } catch (error) {
       console.error('Error generating images:', error);
     }
@@ -49,6 +50,14 @@ const CreateStoryPage = ({ navigateTo }) => {
         />
       )}
       {step === 2 && (
+        <CharacterSummary
+          characters={characters}
+          nextStep={nextStep}
+          prevStep={prevStep}
+          navigateTo={navigateTo}
+        />
+      )}
+      {step === 3 && (
         <StoryPrompt
           characters={characters}
           nextStep={nextStep}
@@ -56,7 +65,7 @@ const CreateStoryPage = ({ navigateTo }) => {
           setGeneratedStory={setGeneratedStory}
         />
       )}
-      {step === 3 && (
+      {step === 4 && (
         <div>
           <h2>Historia Generada</h2>
           <StoryDisplay story={generatedStory} /> {/* Usar StoryDisplay */}

@@ -125,3 +125,16 @@ button.secondary:hover {
     height: 100%;
     object-fit: contain;
 }
+
+.character-image-container {
+    position: relative;
+    width: 100px; /* Ajusta el tamaño según sea necesario */
+    height: 100px; /* Ajusta el tamaño según sea necesario */
+  }
+  
+.character-image {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
+  

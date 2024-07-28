@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import '../../public/styles.css';
 import ImageSelection from './ImageSelection';
 
@@ -14,21 +14,14 @@ const CharacterCustomization = ({ onCharacterUpdate, nextStep, prevStep }) => {
     eyes: 'eyes1',
     eyebrows: 'kid_eyebrow_1_color_1',
     nose: 'kid_nose_1',
-    mouth: 'kid_mouth_1'
+    mouth: 'kid_mouth_1',
+    image: ''  // Añadir campo para la URL de la imagen
   };
 
   const [character, setCharacter] = useState(() => {
     const savedCharacter = localStorage.getItem('character');
     return savedCharacter ? JSON.parse(savedCharacter) : initialCharacterState;
   });
-
-  useEffect(() => {
-    localStorage.setItem('character', JSON.stringify(character));
-    if (onCharacterUpdate) {
-      onCharacterUpdate(character);
-    }
-    console.log('Character updated:', character); // Log character info
-  }, [character]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -47,12 +40,24 @@ const CharacterCustomization = ({ onCharacterUpdate, nextStep, prevStep }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    // Crear URL de la imagen compuesta
+    const imageURL = createCharacterImageURL(character);
+    const updatedCharacter = { ...character, image: imageURL };
+
+    // Actualizar el estado del personaje y el almacenamiento local
+    localStorage.setItem('character', JSON.stringify(updatedCharacter));
+    onCharacterUpdate(updatedCharacter);
     nextStep();
+  };
+
+  const createCharacterImageURL = (character) => {
+    const baseUrl = 'http://localhost:8080/images';
+    return `${baseUrl}/skin/${character.skin}.png`;
   };
 
   return (
     <div className="container">
-      <h2>Personalización del Personaje</h2>
+      <h2>Personalización de los Personajes</h2>
       <form onSubmit={handleSubmit}>
         <label>
           Nombre:
