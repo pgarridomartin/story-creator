@@ -1,62 +1,74 @@
 import React, { useState } from 'react';
-import axios from 'axios';
 import CharacterCustomization from '../components/CharacterCustomization.jsx';
 import StoryPrompt from '../components/StoryPrompt.jsx';
+import StoryDisplay from '../components/StoryDisplay.jsx'; // Importar StoryDisplay
 
-const CreateStoryPage = () => {
+const CreateStoryPage = ({ navigateTo }) => {
+  const [step, setStep] = useState(1);
   const [characters, setCharacters] = useState([]);
-  const [story, setStory] = useState('');
-  const [imagePrompts, setImagePrompts] = useState([]);
+  const [generatedStory, setGeneratedStory] = useState('');
   const [images, setImages] = useState([]);
-  const [step, setStep] = useState(1); // Add step state
 
-  const handleCharacterUpdate = (updatedCharacter) => {
-    setCharacters([...characters.filter(char => char.name !== updatedCharacter.name), updatedCharacter]);
-  };
+  const nextStep = () => setStep(step + 1);
+  const prevStep = () => setStep(step - 1);
 
-  const handleStoryGenerated = (generatedStory, extractedPrompts) => {
-    setStory(generatedStory);
-    setImagePrompts(extractedPrompts);
+  const handleCharacterUpdate = (character) => {
+    setCharacters((prevCharacters) => {
+      const existingCharacterIndex = prevCharacters.findIndex((c) => c.name === character.name);
+      if (existingCharacterIndex !== -1) {
+        const updatedCharacters = [...prevCharacters];
+        updatedCharacters[existingCharacterIndex] = character;
+        return updatedCharacters;
+      } else {
+        return [...prevCharacters, character];
+      }
+    });
   };
 
   const generateImages = async () => {
-    if (imagePrompts.length === 0) {
-      console.error('No image prompts available');
-      return;
-    }
-
     try {
-      const response = await axios.post('http://localhost:3001/generate-images', { prompts: imagePrompts });
-      setImages(response.data.images);
+      const response = await fetch('http://localhost:3001/generate-images', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ story: generatedStory, characters }),
+      });
+      const data = await response.json();
+      setImages(data.images || []);
     } catch (error) {
       console.error('Error generating images:', error);
     }
   };
 
-  const nextStep = () => setStep(step + 1);
-  const prevStep = () => setStep(step - 1);
-
   return (
-    <div>
+    <div className="create-story-page">
       {step === 1 && (
-        <CharacterCustomization onCharacterUpdate={handleCharacterUpdate} nextStep={nextStep} prevStep={prevStep} />
+        <CharacterCustomization
+          onCharacterUpdate={handleCharacterUpdate}
+          nextStep={nextStep}
+          prevStep={prevStep}
+        />
       )}
       {step === 2 && (
-        <StoryPrompt onStoryGenerated={handleStoryGenerated} characters={characters} prevStep={prevStep} />
+        <StoryPrompt
+          characters={characters}
+          nextStep={nextStep}
+          prevStep={prevStep}
+          setGeneratedStory={setGeneratedStory}
+        />
       )}
-      {story && (
+      {step === 3 && (
         <div>
-          <h2>Generated Story</h2>
-          <div dangerouslySetInnerHTML={{ __html: story }} />
-          <button onClick={generateImages}>Generate Images</button>
-        </div>
-      )}
-      {images.length > 0 && (
-        <div>
-          <h2>Generated Images</h2>
-          {images.map((image, index) => (
-            <img key={index} src={image} alt={`Generated scene ${index + 1}`} />
-          ))}
+          <h2>Historia Generada</h2>
+          <StoryDisplay story={generatedStory} /> {/* Usar StoryDisplay */}
+          <button onClick={generateImages}>Generar Imágenes</button>
+          <button onClick={() => navigateTo('home')}>Volver a la página de inicio</button>
+          {images.length > 0 && (
+            <div className="image-gallery">
+              {images.map((image, index) => (
+                <img key={index} src={image} alt={`Generated ${index}`} />
+              ))}
+            </div>
+          )}
         </div>
       )}
     </div>
