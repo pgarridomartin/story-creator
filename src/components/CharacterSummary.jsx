@@ -74,7 +74,6 @@ const CharacterSummary = ({ characters = [], nextStep, prevStep, navigateTo, rem
       <div className="buttons">
         <button className="button secondary" onClick={prevStep}>Añadir más Personajes</button>
         <button className="button" onClick={nextStep}>Continuar</button>
-        <button className="button" onClick={() => navigateTo('home')}>Volver al Inicio</button>
       </div>
     </div>
   );

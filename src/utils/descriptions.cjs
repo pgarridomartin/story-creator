@@ -5,9 +5,9 @@ const skinDescriptions = {
 };
 
 const hairDescriptions = {
-  hair1: "short black hair",
-  hair2: "long blond hair",
-  hair3: "curly red hair"
+  hair1: "short red hair",
+  hair2: "short blond hair",
+  hair3: "short brown hair"
 };
 
 const eyeDescriptions = {
@@ -17,10 +17,10 @@ const eyeDescriptions = {
 };
 
 const eyebrowDescriptions = {
-  kid_eyebrow_1_color_1: "thin black eyebrows",
-  kid_eyebrow_1_color_2: "thick black eyebrows",
-  kid_eyebrow_2_color_3: "arched brown eyebrows",
-  kid_eyebrow_2_color_4: "straight blond eyebrows"
+  kid_eyebrow_1_color_1: "straight blond eyebrows",
+  kid_eyebrow_1_color_2: "straight red eyebrows",
+  kid_eyebrow_2_color_3: "thin black eyebrows",
+  kid_eyebrow_2_color_4: "thin brown eyebrows"
 };
 
 const noseDescriptions = {

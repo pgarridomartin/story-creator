@@ -9,12 +9,12 @@ const CharacterCustomization = ({ onCharacterUpdate, nextStep, prevStep, charact
     age: '3',
     relationship: 'hija',
     role: 'protagonist',
-    skin: 'skin1',
-    hair: 'hair1',
+    skin: 'skin3',
+    hair: 'hair3',
     eyes: 'eyes1',
-    eyebrows: 'kid_eyebrow_1_color_1',
+    eyebrows: 'kid_eyebrow_2_color_4',
     nose: 'kid_nose_1',
-    mouth: 'kid_mouth_1',
+    mouth: 'kid_mouth_2',
     image: ''  // Añadir campo para la URL de la imagen
   };
 
