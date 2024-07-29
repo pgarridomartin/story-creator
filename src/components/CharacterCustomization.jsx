@@ -1,14 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import '../../public/styles.css';
 import ImageSelection from './ImageSelection';
 
-const CharacterCustomization = ({ onCharacterUpdate, nextStep, prevStep }) => {
+const CharacterCustomization = ({ onCharacterUpdate, nextStep, prevStep, character }) => {
   const initialCharacterState = {
-    name: '',
-    gender: '',
-    age: '',
-    relationship: '',
-    role: '',
+    name: 'Lucia',
+    gender: 'female',
+    age: '3',
+    relationship: 'hija',
+    role: 'protagonist',
     skin: 'skin1',
     hair: 'hair1',
     eyes: 'eyes1',
@@ -18,21 +18,24 @@ const CharacterCustomization = ({ onCharacterUpdate, nextStep, prevStep }) => {
     image: ''  // Añadir campo para la URL de la imagen
   };
 
-  const [character, setCharacter] = useState(() => {
-    const savedCharacter = localStorage.getItem('character');
-    return savedCharacter ? JSON.parse(savedCharacter) : initialCharacterState;
-  });
+  const [currentCharacter, setCurrentCharacter] = useState(character || initialCharacterState);
+
+  useEffect(() => {
+    if (character) {
+      setCurrentCharacter(character);
+    }
+  }, [character]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setCharacter((prevCharacter) => ({
+    setCurrentCharacter((prevCharacter) => ({
       ...prevCharacter,
       [name]: value
     }));
   };
 
   const handleImageChange = (type, value) => {
-    setCharacter((prevCharacter) => ({
+    setCurrentCharacter((prevCharacter) => ({
       ...prevCharacter,
       [type]: value
     }));
@@ -41,18 +44,22 @@ const CharacterCustomization = ({ onCharacterUpdate, nextStep, prevStep }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     // Crear URL de la imagen compuesta
-    const imageURL = createCharacterImageURL(character);
-    const updatedCharacter = { ...character, image: imageURL };
+    const imageURL = createCharacterImageURL(currentCharacter);
+    const updatedCharacter = { ...currentCharacter, image: imageURL };
 
     // Actualizar el estado del personaje y el almacenamiento local
     localStorage.setItem('character', JSON.stringify(updatedCharacter));
     onCharacterUpdate(updatedCharacter);
+
+    // Limpiar el formulario restableciendo el estado del personaje
+    setCurrentCharacter(initialCharacterState);
     nextStep();
   };
 
   const createCharacterImageURL = (character) => {
-    const baseUrl = 'http://localhost:8080/images';
-    return `${baseUrl}/skin/${character.skin}.png`;
+    // Generar la URL para una imagen compuesta utilizando todos los atributos del personaje
+    const baseUrl = 'http://localhost:3001/images';
+    return `${baseUrl}/composite?skin=${character.skin}&hair=${character.hair}&eyes=${character.eyes}&eyebrows=${character.eyebrows}&nose=${character.nose}&mouth=${character.mouth}`;
   };
 
   return (
@@ -64,14 +71,14 @@ const CharacterCustomization = ({ onCharacterUpdate, nextStep, prevStep }) => {
           <input
             type="text"
             name="name"
-            value={character.name}
+            value={currentCharacter.name}
             onChange={handleInputChange}
             required
           />
         </label>
         <label>
           Género:
-          <select name="gender" value={character.gender} onChange={handleInputChange} required>
+          <select name="gender" value={currentCharacter.gender} onChange={handleInputChange} required>
             <option value="">Selecciona</option>
             <option value="male">Masculino</option>
             <option value="female">Femenino</option>
@@ -82,14 +89,14 @@ const CharacterCustomization = ({ onCharacterUpdate, nextStep, prevStep }) => {
           <input
             type="number"
             name="age"
-            value={character.age}
+            value={currentCharacter.age}
             onChange={handleInputChange}
             required
           />
         </label>
         <label>
           Parentesco:
-          <select name="relationship" value={character.relationship} onChange={handleInputChange} required>
+          <select name="relationship" value={currentCharacter.relationship} onChange={handleInputChange} required>
             <option value="">Selecciona</option>
             <option value="padre">Padre</option>
             <option value="madre">Madre</option>
@@ -99,28 +106,28 @@ const CharacterCustomization = ({ onCharacterUpdate, nextStep, prevStep }) => {
         </label>
         <label>
           Rol:
-          <select name="role" value={character.role} onChange={handleInputChange} required>
+          <select name="role" value={currentCharacter.role} onChange={handleInputChange} required>
             <option value="">Selecciona</option>
             <option value="protagonist">Protagonista</option>
             <option value="secondary">Secundario</option>
           </select>
         </label>
-        <ImageSelection character={character} handleImageChange={handleImageChange} />
+        <ImageSelection character={currentCharacter} handleImageChange={handleImageChange} />
         <div className="buttons">
           <button type="button" className="button secondary" onClick={prevStep}>Atrás</button>
-          <button type="submit" className="button">Guardar y Siguiente</button>
+          <button type="submit" className="button">Siguiente</button>
         </div>
       </form>
       <div className="character-preview">
         <h2>Vista Previa del Personaje</h2>
         <div className="character-images">
-          <img src={`/images/skin/${character.skin}.png`} alt="Piel" className="character-image skin" />
+          <img src={`/images/skin/${currentCharacter.skin}.png`} alt="Piel" className="character-image skin" />
           <img src={`/images/skin/kid_base.png`} alt="Base" className="character-image skin" />
-          <img src={`/images/hair/${character.hair}.png`} alt="Pelo" className="character-image hair" />
-          <img src={`/images/eyes/${character.eyes}.png`} alt="Ojos" className="character-image eyes" />
-          <img src={`/images/Eyebrows/${character.eyebrows}.png`} alt="Cejas" className="character-image eyebrows" />
-          <img src={`/images/Noses/${character.nose}.png`} alt="Nariz" className="character-image nose" />
-          <img src={`/images/Mouths/${character.mouth}.png`} alt="Boca" className="character-image mouth" />
+          <img src={`/images/hair/${currentCharacter.hair}.png`} alt="Pelo" className="character-image hair" />
+          <img src={`/images/eyes/${currentCharacter.eyes}.png`} alt="Ojos" className="character-image eyes" />
+          <img src={`/images/Eyebrows/${currentCharacter.eyebrows}.png`} alt="Cejas" className="character-image eyebrows" />
+          <img src={`/images/Noses/${currentCharacter.nose}.png`} alt="Nariz" className="character-image nose" />
+          <img src={`/images/Mouths/${currentCharacter.mouth}.png`} alt="Boca" className="character-image mouth" />
         </div>
       </div>
     </div>
