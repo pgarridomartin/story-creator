@@ -3,7 +3,7 @@ const express = require('express');
 const { OpenAI } = require('openai');
 const cors = require('cors');
 const bodyParser = require('body-parser');
-const { generateImage } = require('./midjourney.cjs');
+const { generateImage, generateConsistentImages } = require('./midjourney.cjs');
 const { extractImagePrompts } = require('../src/utils/extractImagePrompts.cjs');
 const { generateStoryPrompt } = require('../src/utils/generateStoryPrompt.cjs');
 
@@ -36,12 +36,12 @@ app.post('/generate-story', async (req, res) => {
 
   try {
     const response = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
+      model: "gpt-4",
       messages: [
         { role: "system", content: "Eres un asistente creativo para generar historias para niños." },
         { role: "user", content: prompt }
       ],
-      max_tokens: 250,
+      max_tokens: 500,
       temperature: 0.7,
     });
 
@@ -63,11 +63,15 @@ app.post('/generate-images', async (req, res) => {
   const imagePrompts = extractImagePrompts(story);
   console.log('Extracted image prompts:', imagePrompts); // Log extracted prompts
 
+  if (imagePrompts.length === 0) {
+    return res.status(400).json({ error: 'No image prompts could be extracted from the story' });
+  }
+
   try {
     const imageUrls = [];
     for (const prompt of imagePrompts) {
       console.log('Generating image with prompt:', prompt); // Log each prompt before generating image
-      const imageUrl = await generateImage(prompt);
+      const { imageUrl } = await generateImage(prompt);
       imageUrls.push(imageUrl);
     }
     res.json({ imageUrls });

@@ -9,6 +9,7 @@ const CreateStoryPage = ({ navigateTo }) => {
   const [characters, setCharacters] = useState([]);
   const [generatedStory, setGeneratedStory] = useState('');
   const [images, setImages] = useState([]);
+  const [prompts, setPrompts] = useState([]);
   const [editingCharacter, setEditingCharacter] = useState(null);
 
   const nextStep = () => setStep(step + 1);
@@ -16,15 +17,15 @@ const CreateStoryPage = ({ navigateTo }) => {
 
   const handleCharacterUpdate = (character) => {
     setCharacters((prevCharacters) => {
-      if (editingCharacter !== null) {
+      const existingCharacterIndex = prevCharacters.findIndex((c) => c.name === character.name);
+      if (existingCharacterIndex !== -1) {
         const updatedCharacters = [...prevCharacters];
-        updatedCharacters[editingCharacter] = character;
+        updatedCharacters[existingCharacterIndex] = character;
         return updatedCharacters;
       } else {
         return [...prevCharacters, character];
       }
     });
-    setEditingCharacter(null);
   };
 
   const removeCharacter = (index) => {
@@ -41,13 +42,18 @@ const CreateStoryPage = ({ navigateTo }) => {
       const response = await fetch('http://localhost:3001/generate-images', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ story: generatedStory, characters }),
+        body: JSON.stringify({ story: generatedStory }),
       });
       const data = await response.json();
-      setImages(data.images || []); // Asegurarse de que images es un array
+      setImages(data.imageUrls || []);
     } catch (error) {
       console.error('Error generating images:', error);
     }
+  };
+
+  const handleGeneratedStory = (story, prompts) => {
+    setGeneratedStory(story);
+    setPrompts(prompts);
   };
 
   return (
@@ -75,7 +81,7 @@ const CreateStoryPage = ({ navigateTo }) => {
           characters={characters}
           nextStep={nextStep}
           prevStep={prevStep}
-          setGeneratedStory={setGeneratedStory}
+          setGeneratedStory={handleGeneratedStory}
         />
       )}
       {step === 4 && (

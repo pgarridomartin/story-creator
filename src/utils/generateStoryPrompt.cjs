@@ -44,14 +44,24 @@ const {
     Para cada página, se generará un texto de entre 20 y 30 palabras y además una descripción tipo prompt extremadamente detallada de la escena sugerida por el texto. Cada página se identificará como "Página 1", "Página 2”, "Página 3”,etc.
     La descripcion detallada del personaje debe repetirse para cada página, para asegurar una continuidad en las imagenes que se generarán posteriormente.
 
-    Ejemplo de la estructura que se espera del cuento: 
+    Ejemplo de la estructura que se espera estrictamente del cuento: 
+    
+    Título
     Página 1: 
-    - Texto de lectura de la primera página
-    - Descripción detallada de la primera escena 
+    - Texto: Texto de la primera página
+    - Descripción: Descripción detallada de la primera escena 
     
     Página 2: 
-    - Texto de lectura de la segunda página
-    - Descripción detallada de la segunda escena.`;
+    - Texto: Texto de la segunda página
+    - Descripción: Descripción detallada de la segunda escena.
+    
+    
+    
+    
+    
+    
+    .
+    `;
   };
   
   module.exports = { generateStoryPrompt };

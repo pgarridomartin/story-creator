@@ -5,7 +5,6 @@ const StoryPrompt = ({ characters, nextStep, prevStep, setGeneratedStory }) => {
   const [storyTitle, setStoryTitle] = useState('');
   const [storyPrompt, setStoryPrompt] = useState('');
   const [story, setStory] = useState('');
-  const [prompts, setPrompts] = useState([]);
 
   const handleStoryTitleChange = (e) => {
     setStoryTitle(e.target.value);
@@ -20,10 +19,9 @@ const StoryPrompt = ({ characters, nextStep, prevStep, setGeneratedStory }) => {
     try {
       const response = await axios.post('http://localhost:3001/generate-story', { storyTitle, characters, storyPrompt });
       const generatedStory = response.data.story;
+      const prompts = response.data.prompts || [];
       setStory(generatedStory);
-      setPrompts(response.data.prompts);
-      setGeneratedStory(generatedStory); // Actualizar el estado en CreateStoryPage
-      console.log('Prompts to be sent to MidJourney:', response.data.prompts);
+      setGeneratedStory(generatedStory, prompts); // Actualizar el estado en CreateStoryPage
       nextStep();
     } catch (error) {
       console.error('Error generating story:', error);
