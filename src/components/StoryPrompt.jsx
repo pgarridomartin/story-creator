@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { extractImagePrompts } from '../utils/extractImagePrompts.cjs'; // Asegúrate de ajustar la ruta si es necesario
+import LoadingSpinner from '../components/LoadingSpinner.jsx'; // Asegúrate de ajustar la ruta si es necesario
 
 const StoryPrompt = ({ characters, nextStep, prevStep, setGeneratedStory }) => {
   const [storyTitle, setStoryTitle] = useState('');
   const [storyPrompt, setStoryPrompt] = useState('');
   const [story, setStory] = useState('');
+  const [loading, setLoading] = useState(false); // Estado para controlar la animación de carga
 
   const handleStoryTitleChange = (e) => {
     setStoryTitle(e.target.value);
@@ -17,6 +19,7 @@ const StoryPrompt = ({ characters, nextStep, prevStep, setGeneratedStory }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true); // Mostrar la animación de carga
     try {
       const response = await axios.post('http://localhost:3001/generate-story', { storyTitle, characters, storyPrompt });
       const generatedStory = response.data.story;
@@ -26,6 +29,8 @@ const StoryPrompt = ({ characters, nextStep, prevStep, setGeneratedStory }) => {
       nextStep();
     } catch (error) {
       console.error('Error generating story:', error);
+    } finally {
+      setLoading(false); // Ocultar la animación de carga
     }
   };
 
@@ -58,6 +63,7 @@ const StoryPrompt = ({ characters, nextStep, prevStep, setGeneratedStory }) => {
           <button type="submit" className="button">Generar Historia</button>
         </div>
       </form>
+      {loading && <LoadingSpinner />} {/* Mostrar animación de carga */}
       {story && (
         <div className="story-preview">
           <h2>Historia Generada</h2>

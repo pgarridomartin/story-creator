@@ -41,7 +41,7 @@ app.post('/generate-story', async (req, res) => {
         { role: "system", content: "Eres un asistente creativo para generar historias para niños." },
         { role: "user", content: prompt }
       ],
-      max_tokens: 500,
+      max_tokens: 300,
       temperature: 0.7,
     });
 

@@ -3,14 +3,15 @@ import CharacterCustomization from '../components/CharacterCustomization.jsx';
 import StoryPrompt from '../components/StoryPrompt.jsx';
 import StoryDisplay from '../components/StoryDisplay.jsx';
 import CharacterSummary from '../components/CharacterSummary.jsx';
+import LoadingSpinner from '../components/LoadingSpinner.jsx'; // Asegúrate de ajustar la ruta si es necesario
 
 const CreateStoryPage = ({ navigateTo }) => {
   const [step, setStep] = useState(1);
   const [characters, setCharacters] = useState([]);
   const [generatedStory, setGeneratedStory] = useState('');
   const [images, setImages] = useState([]);
-  const [prompts, setPrompts] = useState([]);
-  const [editingCharacter, setEditingCharacter] = useState(null);
+  const [loadingImages, setLoadingImages] = useState(false); // Estado para controlar la animación de carga de imágenes
+  const [editingCharacter, setEditingCharacter] = useState(null); // Definir el estado para editingCharacter
 
   const nextStep = () => setStep(step + 1);
   const prevStep = () => setStep(step - 1);
@@ -38,22 +39,20 @@ const CreateStoryPage = ({ navigateTo }) => {
   };
 
   const generateImages = async () => {
+    setLoadingImages(true); // Mostrar la animación de carga
     try {
       const response = await fetch('http://localhost:3001/generate-images', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ story: generatedStory }),
+        body: JSON.stringify({ story: generatedStory }), // Enviar historia generada
       });
       const data = await response.json();
       setImages(data.imageUrls || []);
     } catch (error) {
       console.error('Error generating images:', error);
+    } finally {
+      setLoadingImages(false); // Ocultar la animación de carga
     }
-  };
-
-  const handleGeneratedStory = (story, prompts) => {
-    setGeneratedStory(story);
-    setPrompts(prompts);
   };
 
   return (
@@ -81,7 +80,7 @@ const CreateStoryPage = ({ navigateTo }) => {
           characters={characters}
           nextStep={nextStep}
           prevStep={prevStep}
-          setGeneratedStory={handleGeneratedStory}
+          setGeneratedStory={setGeneratedStory}
         />
       )}
       {step === 4 && (
@@ -90,6 +89,7 @@ const CreateStoryPage = ({ navigateTo }) => {
           <StoryDisplay story={generatedStory} />
           <button onClick={generateImages}>Generar Imágenes</button>
           <button onClick={() => navigateTo('home')}>Volver a la página de inicio</button>
+          {loadingImages && <LoadingSpinner />} {/* Mostrar animación de carga */}
           {images.length > 0 && (
             <div className="image-gallery">
               {images.map((image, index) => (
