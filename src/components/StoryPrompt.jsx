@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { extractImagePrompts } from '../utils/extractImagePrompts.cjs'; // Asegúrate de ajustar la ruta si es necesario
 
 const StoryPrompt = ({ characters, nextStep, prevStep, setGeneratedStory }) => {
   const [storyTitle, setStoryTitle] = useState('');
@@ -19,7 +20,7 @@ const StoryPrompt = ({ characters, nextStep, prevStep, setGeneratedStory }) => {
     try {
       const response = await axios.post('http://localhost:3001/generate-story', { storyTitle, characters, storyPrompt });
       const generatedStory = response.data.story;
-      const prompts = response.data.prompts || [];
+      const prompts = extractImagePrompts(generatedStory); // Extraer prompts de la historia generada
       setStory(generatedStory);
       setGeneratedStory(generatedStory, prompts); // Actualizar el estado en CreateStoryPage
       nextStep();

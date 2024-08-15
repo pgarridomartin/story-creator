@@ -17,7 +17,7 @@ const generateImage = async (sceneDescription) => {
   console.log('Styled prompt:', prompt); // Log del styled prompt
 
   const data = {
-    "model": "dall-e-2",
+    "model": "dall-e-3",
     "prompt": prompt,
     "n": 1,
     "size": "1024x1024"

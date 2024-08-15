@@ -9,7 +9,7 @@ const StoryDisplay = ({ story }) => {
     const titleMatch = story.match(/Título:\s*(.*?)\n/);
     const title = titleMatch ? titleMatch[1].trim() : 'Título no disponible en story display';
 
-    const textMatches = [...story.matchAll(/- Texto:\s*(.*?)\s*- Descripción:/gs)];
+    const textMatches = [...story.matchAll(/Página \d+:\s*- Texto:\s*(.*?)\s*- Descripción:/gs)];
     const texts = textMatches.map((match) => match[1].trim());
     console.log('Titulo extraído', title); // Log título
     console.log('Textos extraídos', texts); // Log textos
