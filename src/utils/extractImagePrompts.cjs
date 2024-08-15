@@ -1,15 +1,21 @@
+// src/utils/extractImagePrompts.cjs
 const extractImagePrompts = (story) => {
-  // Ajustar regex para coincidir con el formato proporcionado
-  const pages = story.match(/Página \d+:\s*- Texto:.*?\s*- Descripción:(.*?)(?=\nPágina \d+:|$)/gs);
-  if (!pages) {
+  const pagesPattern = /(\*\*Página \d+:\*\*|Página \d+:)/g;
+  const sections = story.split(pagesPattern).filter(section => section.trim() !== '');
+  
+  if (sections.length < 2) {
     console.error('No pages found in the story');
     return [];
   }
 
-  const imagePrompts = pages.map(page => {
-    const match = page.match(/- Descripción:\s*(.*)/);
-    return match ? match[1].trim() : null;
-  }).filter(prompt => prompt !== null);
+  const imagePrompts = [];
+  for (let i = 1; i < sections.length; i += 2) {
+    const pageContent = sections[i + 1] || sections[i];
+    const match = pageContent.match(/- Descripción:\s*(.*?)(?=\*\*Página \d+|\n)/s);
+    if (match) {
+      imagePrompts.push(match[1].trim());
+    }
+  }
 
   console.log('Extracted image prompts:', imagePrompts); // Log extracted prompts
   return imagePrompts;

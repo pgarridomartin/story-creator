@@ -32,11 +32,11 @@ app.post('/generate-story', async (req, res) => {
   }
 
   const prompt = generateStoryPrompt(characters, storyTitle, storyPrompt);
-  console.log('Prompt sent to ChatGPT:', prompt); // Log the prompt
+  console.log('Prompt sent to ChatGPT:', prompt);
 
   try {
     const response = await openai.chat.completions.create({
-      model: "gpt-4",
+      model: "gpt-4-turbo",
       messages: [
         { role: "system", content: "Eres un asistente creativo para generar historias para niños." },
         { role: "user", content: prompt }
@@ -46,7 +46,7 @@ app.post('/generate-story', async (req, res) => {
     });
 
     const generatedStory = response.choices[0].message.content.trim();
-    console.log('Generated story:', generatedStory); // Log the generated story
+    console.log('Generated story:', generatedStory);
     res.json({ story: generatedStory });
   } catch (error) {
     console.error('Error generating story:', error);
@@ -61,7 +61,7 @@ app.post('/generate-images', async (req, res) => {
   }
 
   const imagePrompts = extractImagePrompts(story);
-  console.log('Extracted image prompts:', imagePrompts); // Log extracted prompts
+  console.log('Extracted image prompts:', imagePrompts);
 
   if (imagePrompts.length === 0) {
     return res.status(400).json({ error: 'No image prompts could be extracted from the story' });
@@ -69,9 +69,9 @@ app.post('/generate-images', async (req, res) => {
 
   try {
     const imageUrls = [];
-    for (const prompt of imagePrompts) {
-      console.log('Generating image with prompt:', prompt); // Log each prompt before generating image
-      const { imageUrl } = await generateImage(prompt);
+    for (const [index, prompt] of imagePrompts.entries()) {
+      console.log('Generating image with prompt:', prompt);
+      const { imageUrl, created } = await generateImage(prompt, index);  // Note the change to just use index for uniqueness
       imageUrls.push(imageUrl);
     }
     res.json({ imageUrls });
