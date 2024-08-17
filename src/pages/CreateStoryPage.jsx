@@ -9,9 +9,8 @@ const CreateStoryPage = ({ navigateTo }) => {
   const [characters, setCharacters] = useState([]);
   const [generatedStory, setGeneratedStory] = useState('');
   const [images, setImages] = useState([]);
-  const [prompts, setPrompts] = useState([]);
-  const [editingCharacter, setEditingCharacter] = useState(null); // Agregar esta línea
   const [loading, setLoading] = useState(false);
+  const [editingCharacter, setEditingCharacter] = useState(null); // Definir el estado para editingCharacter
 
   const nextStep = () => setStep(step + 1);
   const prevStep = () => setStep(step - 1);
@@ -27,6 +26,7 @@ const CreateStoryPage = ({ navigateTo }) => {
         return [...prevCharacters, character];
       }
     });
+    setEditingCharacter(null); // Reset editingCharacter after update
   };
 
   const removeCharacter = (index) => {
@@ -35,7 +35,7 @@ const CreateStoryPage = ({ navigateTo }) => {
 
   const editCharacter = (index) => {
     setEditingCharacter(index);
-    setStep(1);
+    setStep(1); // Volver al paso de edición de personaje
   };
 
   const generateImages = async () => {
@@ -81,7 +81,6 @@ const CreateStoryPage = ({ navigateTo }) => {
           nextStep={nextStep}
           prevStep={prevStep}
           setGeneratedStory={setGeneratedStory}
-          setPrompts={setPrompts}
         />
       )}
       {step === 4 && (
@@ -89,8 +88,8 @@ const CreateStoryPage = ({ navigateTo }) => {
           <h2>Historia Generada</h2>
           <StoryDisplay story={generatedStory} />
           <button onClick={generateImages}>Generar Imágenes</button>
-          {loading && <p>Loading...</p>}
           <button onClick={() => navigateTo('home')}>Volver a la página de inicio</button>
+          {loading && <p>Generando imágenes...</p>}
           {images.length > 0 && (
             <div className="image-gallery">
               {images.map((image, index) => (
