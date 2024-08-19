@@ -44,22 +44,22 @@ const CreateStoryPage = ({ navigateTo }) => {
     setLoading(true);
     try {
       const temporaryPrompts = [
-        "Draw a three years old girl. with shoulder length hair brown and straight, small nose, brown eyes, round face, round face, smiling, smelling a flower, disney pixar cartoon type B style",
-        "Draw a three years old girl. with shoulder-length brown and straight hair, small nose, brown eyes, round face, smiling, running on the grass, disney pixar cartoon type B style.",
-        "Draw a three years old girl. with shoulder-length brown and straight hair, small nose, brown eyes, round face, smiling, eating an apple, disney pixar cartoon type B style."
+        "Draws a cute three-year-old girl with shoulder-length brown hair, big eyes and a Pixar-style smile on her face, dressed in a pink T-shirt, full-length, running on grass, in a village full of houses and trees, butterflies and birds. The design is reminiscent of a Disney cartoon character, with a 3D rendering, bright colors, high saturation, rich detail and a close-up perspective under natural lighting. The overall mood is warm.",
+        "Draws a cute three-year-old girl with shoulder-length brown hair, big eyes and a Pixar-style smile on her face, dressed in a pink T-shirt, full-length, jumping very high, in a village full of houses and trees, butterflies and birds. The design is reminiscent of a Disney cartoon character, with a 3D rendering, bright colors, high saturation, rich detail and a close-up perspective under natural lighting. The overall mood is warm.",
+        "Draws a cute three-year-old girl with shoulder-length brown hair, big eyes and a Pixar-style smile on her face, dressed in a pink T-shirt, full-length, eating an apple under a big tree, in a village full of houses and trees, butterflies and birds. The design is reminiscent of a Disney cartoon character, with a 3D rendering, bright colors, high saturation, rich detail and a close-up perspective under natural lighting. The overall mood is warm."
       ];
   
       const imagePrompts = extractImagePrompts(generatedStory);
       const finalPrompts = temporaryPrompts.length ? temporaryPrompts : imagePrompts;
   
-      let storedSeed = initialSeed; // Utiliza una variable local para almacenar el seed
+      let storedSeed = initialSeed; 
   
       for (const [index, prompt] of finalPrompts.entries()) {
         const currentSeed = index === 0 ? undefined : storedSeed;
   
         if (index > 0 && !currentSeed) {
           console.log(`Skipping request for prompt ${index + 1} due to null seed.`);
-          continue;
+          break;
         }
   
         console.log(`Sending seed for prompt ${index + 1}: ${currentSeed}`);
@@ -69,7 +69,13 @@ const CreateStoryPage = ({ navigateTo }) => {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             prompt,
-            seed: currentSeed
+            seed: currentSeed,
+            negative_prompt: "painting, extra fingers, mutated hands, poorly drawn hands, poorly drawn face, deformed, ugly, blurry, bad anatomy, bad proportions, extra limbs, cloned face, skinny, glitchy, double torso, extra arms, extra hands, mangled fingers, missing lips, ugly face, distorted face, extra legs, anime",
+            width: 512,
+            height: 512,
+            output_format: "jpeg",
+            num_inference_steps: 30,
+            guidance_scale: 7.5
           }),
         });
   
@@ -81,15 +87,16 @@ const CreateStoryPage = ({ navigateTo }) => {
   
           if (index === 0 && data.seed) {
             console.log('Seed found in response:', data.seed);
-            storedSeed = data.seed;  // Almacena el seed en la variable local
-            setInitialSeed(data.seed);  // También actualiza el estado en React
+            storedSeed = data.seed;  
+            setInitialSeed(data.seed);  
           }
         } else {
           console.error('No image URL returned:', data);
+          break; // Stop further processing if no image URL is returned
         }
       }
   
-      console.log('Final seed stored:', storedSeed);  // Verifica el valor final del seed almacenado
+      console.log('Final seed stored:', storedSeed);  
   
     } catch (error) {
       console.error('Error generating images:', error);
