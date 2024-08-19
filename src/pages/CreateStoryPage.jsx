@@ -44,9 +44,9 @@ const CreateStoryPage = ({ navigateTo }) => {
     setLoading(true);
     try {
       const temporaryPrompts = [
-        "Draw a 30 years old man, green eyes, black hair, running, disney pixar style.",
-        "Draw the same man jumping.",
-        "Draw the same man eating."
+        "Draw a three years old girl. with shoulder length hair brown and straight, small nose, brown eyes, round face, round face, smiling, smelling a flower, disney pixar cartoon type B style",
+        "Draw a three years old girl. with shoulder-length brown and straight hair, small nose, brown eyes, round face, smiling, running on the grass, disney pixar cartoon type B style.",
+        "Draw a three years old girl. with shoulder-length brown and straight hair, small nose, brown eyes, round face, smiling, eating an apple, disney pixar cartoon type B style."
       ];
   
       const imagePrompts = extractImagePrompts(generatedStory);
