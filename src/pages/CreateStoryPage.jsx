@@ -12,7 +12,7 @@ const CreateStoryPage = ({ navigateTo }) => {
   const [images, setImages] = useState([]);
   const [loading, setLoading] = useState(false);
   const [editingCharacter, setEditingCharacter] = useState(null);
-  const [initialSeed, setInitialSeed] = useState(null);
+  const [initialSeed, setInitialSeed] = useState(null); 
 
   const nextStep = () => setStep(step + 1);
   const prevStep = () => setStep(step - 1);
@@ -48,45 +48,57 @@ const CreateStoryPage = ({ navigateTo }) => {
         "Draw the same man jumping.",
         "Draw the same man eating."
       ];
-
+  
       const imagePrompts = extractImagePrompts(generatedStory);
       const finalPrompts = temporaryPrompts.length ? temporaryPrompts : imagePrompts;
-
+  
+      let storedSeed = initialSeed; // Utiliza una variable local para almacenar el seed
+  
       for (const [index, prompt] of finalPrompts.entries()) {
-        const seedToSend = index === 0 ? undefined : initialSeed;
-        console.log(`Sending seed for prompt ${index + 1}:`, seedToSend);
-
+        const currentSeed = index === 0 ? undefined : storedSeed;
+  
+        if (index > 0 && !currentSeed) {
+          console.log(`Skipping request for prompt ${index + 1} due to null seed.`);
+          continue;
+        }
+  
+        console.log(`Sending seed for prompt ${index + 1}: ${currentSeed}`);
+  
         const response = await fetch('http://localhost:3001/generate-images', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             prompt,
-            seed: seedToSend
+            seed: currentSeed
           }),
         });
-
+  
         const data = await response.json();
         console.log('Full response data:', data);
-
+  
         if (data.imageUrl) {
           setImages((prevImages) => [...prevImages, data.imageUrl]);
-
+  
           if (index === 0 && data.seed) {
             console.log('Seed found in response:', data.seed);
-            setInitialSeed(data.seed); 
-          } else if (index > 0 && !data.seed) {
-            console.error('No seed returned for subsequent image:', data);
+            storedSeed = data.seed;  // Almacena el seed en la variable local
+            setInitialSeed(data.seed);  // También actualiza el estado en React
           }
         } else {
           console.error('No image URL returned:', data);
         }
       }
+  
+      console.log('Final seed stored:', storedSeed);  // Verifica el valor final del seed almacenado
+  
     } catch (error) {
       console.error('Error generating images:', error);
     } finally {
       setLoading(false);
     }
   };
+  
+  
 
   return (
     <div className="create-story-page">
