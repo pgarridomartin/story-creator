@@ -12,7 +12,7 @@ const CreateStoryPage = ({ navigateTo }) => {
   const [images, setImages] = useState([]);
   const [loading, setLoading] = useState(false);
   const [editingCharacter, setEditingCharacter] = useState(null);
-  const [initialSeed, setInitialSeed] = useState(null); // Almacena el seed
+  const [initialSeed, setInitialSeed] = useState(null);
 
   const nextStep = () => setStep(step + 1);
   const prevStep = () => setStep(step - 1);
@@ -43,27 +43,39 @@ const CreateStoryPage = ({ navigateTo }) => {
   const generateImages = async () => {
     setLoading(true);
     try {
+      const temporaryPrompts = [
+        "Draw a 30 years old man, green eyes, black hair, running, disney pixar style.",
+        "Draw the same man jumping.",
+        "Draw the same man eating."
+      ];
+
       const imagePrompts = extractImagePrompts(generatedStory);
-      console.log('Extracted image prompts:', imagePrompts);
-  
-      for (const [index, prompt] of imagePrompts.entries()) {
+      const finalPrompts = temporaryPrompts.length ? temporaryPrompts : imagePrompts;
+
+      for (const [index, prompt] of finalPrompts.entries()) {
+        const seedToSend = index === 0 ? undefined : initialSeed;
+        console.log(`Sending seed for prompt ${index + 1}:`, seedToSend);
+
         const response = await fetch('http://localhost:3001/generate-images', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             prompt,
-            seed: initialSeed || undefined // Asegúrate de que el seed se maneja correctamente
+            seed: seedToSend
           }),
         });
-  
+
         const data = await response.json();
-  
+        console.log('Full response data:', data);
+
         if (data.imageUrl) {
           setImages((prevImages) => [...prevImages, data.imageUrl]);
-  
-          // Guarda el seed de la primera imagen generada
+
           if (index === 0 && data.seed) {
-            setInitialSeed(data.seed);
+            console.log('Seed found in response:', data.seed);
+            setInitialSeed(data.seed); 
+          } else if (index > 0 && !data.seed) {
+            console.error('No seed returned for subsequent image:', data);
           }
         } else {
           console.error('No image URL returned:', data);
@@ -75,8 +87,6 @@ const CreateStoryPage = ({ navigateTo }) => {
       setLoading(false);
     }
   };
-  
-  
 
   return (
     <div className="create-story-page">

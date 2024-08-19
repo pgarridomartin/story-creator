@@ -63,7 +63,7 @@ app.post('/generate-images', async (req, res) => {
 
   try {
     const imageData = await generateImage(prompt, seed);
-    console.log('Full API Response:', JSON.stringify(imageData, null, 2)); // Log completo de la respuesta
+    console.log('Generated image seed:', imageData.seed);
 
     if (!imageData || !imageData.image) {
       throw new Error('Invalid image data received');

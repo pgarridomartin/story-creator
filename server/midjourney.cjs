@@ -9,33 +9,24 @@ const generateImage = async (prompt, seed = null) => {
     throw new Error('STABILITY_API_KEY is not defined in environment variables');
   }
 
-  const payload = {
-    prompt: prompt,
-    output_format: "jpeg",
-    seed: seed || undefined // Asegúrate de enviar el seed si está disponible
-  };
-
   const form = new FormData();
-  Object.keys(payload).forEach(key => form.append(key, payload[key]));
-
-  const config = {
-    method: 'post',
-    url: apiUrl,
-    headers: {
-      Authorization: `Bearer ${apiKey}`,
-      ...form.getHeaders()
-    },
-    data: form,
-    responseType: 'json',
-  };
+  form.append('prompt', prompt);
+  form.append('output_format', 'jpeg');
+  if (seed) {
+    form.append('seed', seed);
+  }
 
   try {
-    const response = await axios(config);
+    const response = await axios.post(apiUrl, form, {
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        ...form.getHeaders()
+      },
+      responseType: 'json',
+    });
+
     if (response.status === 200) {
-      return {
-        image: response.data.image, 
-        seed: response.data.seed || seed // Asegúrate de retornar el seed o mantener el anterior
-      };
+      return response.data;
     } else {
       console.error('Unexpected status code:', response.status);
       console.error('Error response:', response.data);
@@ -50,6 +41,5 @@ const generateImage = async (prompt, seed = null) => {
     throw error;
   }
 };
-
 
 module.exports = { generateImage };
