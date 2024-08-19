@@ -1,39 +1,55 @@
 const axios = require('axios');
+const FormData = require('form-data');
 
-const generateImage = async (prompt) => {
-  const apiKey = process.env.STABILITY_API_KEY; // Tu API key para Stability.ai
+const generateImage = async (prompt, seed = null) => {
+  const apiKey = process.env.STABILITY_API_KEY;
   const apiUrl = 'https://api.stability.ai/v2beta/stable-image/generate/sd3';
 
   if (!apiKey) {
     throw new Error('STABILITY_API_KEY is not defined in environment variables');
   }
 
-  const data = {
-    text_prompts: [{ text: prompt }],
-    cfg_scale: 7,
-    height: 1024,
-    width: 1024,
-    samples: 1, // Número de imágenes a generar
+  const payload = {
+    prompt: prompt,
+    output_format: "jpeg",
+    seed: seed || undefined // Asegúrate de enviar el seed si está disponible
   };
+
+  const form = new FormData();
+  Object.keys(payload).forEach(key => form.append(key, payload[key]));
 
   const config = {
     method: 'post',
     url: apiUrl,
     headers: {
-      'Content-Type': 'application/json',
       Authorization: `Bearer ${apiKey}`,
+      ...form.getHeaders()
     },
-    data: JSON.stringify(data),
-    timeout: 30000, // Timeout de 30 segundos
+    data: form,
+    responseType: 'json',
   };
 
   try {
     const response = await axios(config);
-    return response.data; // Ajusta esto según la estructura de la respuesta de la API
+    if (response.status === 200) {
+      return {
+        image: response.data.image, 
+        seed: response.data.seed || seed // Asegúrate de retornar el seed o mantener el anterior
+      };
+    } else {
+      console.error('Unexpected status code:', response.status);
+      console.error('Error response:', response.data);
+      throw new Error(`Request failed with status ${response.status}`);
+    }
   } catch (error) {
-    console.error('Error generating image with Stable Diffusion:', error.response ? error.response.data : error.message);
+    if (error.response) {
+      console.error('Error generating image with Stable Diffusion:', error.response.data);
+    } else {
+      console.error('Error generating image with Stable Diffusion:', error.message);
+    }
     throw error;
   }
 };
+
 
 module.exports = { generateImage };

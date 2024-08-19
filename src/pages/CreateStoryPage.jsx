@@ -3,6 +3,7 @@ import CharacterCustomization from '../components/CharacterCustomization.jsx';
 import StoryPrompt from '../components/StoryPrompt.jsx';
 import StoryDisplay from '../components/StoryDisplay.jsx';
 import CharacterSummary from '../components/CharacterSummary.jsx';
+import { extractImagePrompts } from '../utils/extractImagePrompts.cjs';
 
 const CreateStoryPage = ({ navigateTo }) => {
   const [step, setStep] = useState(1);
@@ -10,7 +11,8 @@ const CreateStoryPage = ({ navigateTo }) => {
   const [generatedStory, setGeneratedStory] = useState('');
   const [images, setImages] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [editingCharacter, setEditingCharacter] = useState(null); // Definir el estado para editingCharacter
+  const [editingCharacter, setEditingCharacter] = useState(null);
+  const [initialSeed, setInitialSeed] = useState(null); // Almacena el seed
 
   const nextStep = () => setStep(step + 1);
   const prevStep = () => setStep(step - 1);
@@ -26,7 +28,7 @@ const CreateStoryPage = ({ navigateTo }) => {
         return [...prevCharacters, character];
       }
     });
-    setEditingCharacter(null); // Reset editingCharacter after update
+    setEditingCharacter(null);
   };
 
   const removeCharacter = (index) => {
@@ -35,25 +37,46 @@ const CreateStoryPage = ({ navigateTo }) => {
 
   const editCharacter = (index) => {
     setEditingCharacter(index);
-    setStep(1); // Volver al paso de edición de personaje
+    setStep(1);
   };
 
   const generateImages = async () => {
     setLoading(true);
     try {
-      const response = await fetch('http://localhost:3001/generate-images', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ story: generatedStory }),
-      });
-      const data = await response.json();
-      setImages(data.imageUrls || []);
+      const imagePrompts = extractImagePrompts(generatedStory);
+      console.log('Extracted image prompts:', imagePrompts);
+  
+      for (const [index, prompt] of imagePrompts.entries()) {
+        const response = await fetch('http://localhost:3001/generate-images', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            prompt,
+            seed: initialSeed || undefined // Asegúrate de que el seed se maneja correctamente
+          }),
+        });
+  
+        const data = await response.json();
+  
+        if (data.imageUrl) {
+          setImages((prevImages) => [...prevImages, data.imageUrl]);
+  
+          // Guarda el seed de la primera imagen generada
+          if (index === 0 && data.seed) {
+            setInitialSeed(data.seed);
+          }
+        } else {
+          console.error('No image URL returned:', data);
+        }
+      }
     } catch (error) {
       console.error('Error generating images:', error);
     } finally {
       setLoading(false);
     }
   };
+  
+  
 
   return (
     <div className="create-story-page">

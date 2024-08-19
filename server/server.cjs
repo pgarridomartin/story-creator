@@ -37,11 +37,12 @@ app.post('/generate-story', async (req, res) => {
         { role: "system", content: "You are a creative assistant that helps to generate children stories." },
         { role: "user", content: prompt }
       ],
-      max_tokens: 500,
+      max_tokens: 300,
       temperature: 0.7,
     });
 
     const generatedStory = response.choices[0].message.content.trim();
+    console.log('Generated story sin filtrar:', generatedStory); // Log de la historia generada
     res.json({ story: generatedStory });
   } catch (error) {
     console.error('Error generating story:', error);
@@ -51,21 +52,33 @@ app.post('/generate-story', async (req, res) => {
 
 // Ruta para generar imágenes usando Stable Diffusion
 app.post('/generate-images', async (req, res) => {
-  const { prompt } = req.body;
+  const { prompt, seed } = req.body;
 
-  console.log('Received prompt:', prompt); // Esto debería mostrar el prompt recibido en la consola del servidor
+  console.log('Received prompt:', prompt);
+  console.log('Received seed:', seed);
 
   if (!prompt) {
     return res.status(400).json({ error: 'Prompt must be provided to generate image' });
   }
 
   try {
-    const imageData = await generateImage(prompt);
-    res.json({ imageUrls: imageData.artifacts.map(artifact => artifact.image_url) });
+    const imageData = await generateImage(prompt, seed);
+    console.log('Full API Response:', JSON.stringify(imageData, null, 2)); // Log completo de la respuesta
+
+    if (!imageData || !imageData.image) {
+      throw new Error('Invalid image data received');
+    }
+
+    res.json({ 
+      imageUrl: `data:image/jpeg;base64,${imageData.image}`, 
+      seed: imageData.seed  || null
+    });
   } catch (error) {
+    console.error('Error generating images:', error.message || error);
     res.status(500).json({ error: 'Error generating images' });
   }
 });
+
 
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
